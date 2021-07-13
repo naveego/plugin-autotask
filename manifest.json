@@ -36,7 +36,7 @@
       ],
       "Secret":
       {
-        "ui:widget": "Secret"
+        "ui:widget": "password"
       }
     },
     "schema": {
