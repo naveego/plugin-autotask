@@ -1,0 +1,70 @@
+{
+  "id": "plugin-autotask",
+  "displayName": "AutoTask",
+  "description": "Plugin for integrating data with AutoTask",
+  "apiVersion": "1.5",
+  "versionDescription": "Version 0.0.1",
+  "version": "0.0.1",
+  "iconFile": "icon.png",
+  "executable": "PluginAutoTask",
+  "kind": "publisher",
+  "os": "$GOOS",
+  "arch": "$GOARCH",
+  "canProduceMultipleSchemas": true,
+  "canAcceptQueryBasedSchemas": false,
+  "canUseOAuth": true,
+  "canWrite": false,
+  "canConfigure": true,
+  "querySchema": {
+    "ui": {
+      "ui:widget": "code",
+      "ui:options": {
+        "language": "sql"
+      }
+    },
+    "schema": {
+      "type": "string"
+    }
+  },
+  "configSchema": {
+    "ui": {
+      "ui:order": [
+        "ApiZone",
+        "ApiIntegrationCode",
+        "UserName",
+        "Secret"
+      ]
+    },
+    "schema": {
+      "type": "object",
+      "properties": {
+        "ApiZone" : {
+          "type": "string",
+          "title": "ApiZone",
+          "description": "API Zone - i.e. Aunalytics is \"webservices1\""
+        },
+        "ApiIntegrationCode": {
+          "type": "string",
+          "title": "ApiIntegrationCode",
+          "description": "Api Integration Code"
+        },
+        "UserName" : {
+          "type": "string",
+          "title": "UserName",
+          "description": "API UserName"
+        },
+        "Secret": {
+          "type": "string",
+          "title": "Secret",
+          "description": "API Secret"
+        }
+      },
+      "required": [
+        "UserName",
+        "Secret",
+        "ApiIntegrationCode",
+        "ApiZone"
+      ]
+    }
+  }
+}
