@@ -33,7 +33,11 @@
         "ApiIntegrationCode",
         "UserName",
         "Secret"
-      ]
+      ],
+      "Secret":
+      {
+        "ui:widget": "Secret"
+      }
     },
     "schema": {
       "type": "object",
