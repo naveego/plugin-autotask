@@ -98,14 +98,14 @@ namespace PluginHubspot.API.Utility
         private class QueryResponseWrapper
         {
             [JsonProperty("items")] public List<Dictionary<string, object>> Items { get; set; }
-            [JsonProperty("pageDetails")] public PageDetails PageDetails { get; }
+            [JsonProperty("pageDetails")] public Dictionary<string, object> PageDetails { get; set; }
         }
         
-        private class PageDetails
-        {
-            [JsonProperty("nextPageUrl")] public string NextPageUrl { get; set; }
-            [JsonProperty("count")] public string Count { get; }
-        }
+        // private class PageDetails
+        // {
+        //     [JsonProperty("nextPageUrl")] public string NextPageUrl { get; set; }
+        //     [JsonProperty("count")] public string Count { get; }
+        // }
         public string Id { get; set; } = "";
         public string Name { get; set; } = "";
         public string BasePath { get; set; } = "";
@@ -183,7 +183,9 @@ namespace PluginHubspot.API.Utility
                         Action = Record.Types.Action.Upsert,
                         DataJson = JsonConvert.SerializeObject(recordMap)
                     };
+
                 }
+            nextPageUrl = content.PageDetails["nextPageUrl"].ToString();
             } while (!string.IsNullOrWhiteSpace(nextPageUrl));
         }
 
