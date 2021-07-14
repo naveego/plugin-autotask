@@ -2,7 +2,7 @@
   "id": "plugin-autotask",
   "displayName": "AutoTask",
   "description": "Plugin for integrating data with AutoTask",
-  "apiVersion": "1.5",
+  "apiVersion": "2",
   "versionDescription": "Version 0.0.1",
   "version": "0.0.1",
   "iconFile": "icon.png",
@@ -45,7 +45,7 @@
         "ApiZone" : {
           "type": "string",
           "title": "ApiZone",
-          "description": "API Zone - i.e. Aunalytics is \"webservices1\""
+          "description": "API Zone - i.e. Example is \"webservices1\""
         },
         "ApiIntegrationCode": {
           "type": "string",
