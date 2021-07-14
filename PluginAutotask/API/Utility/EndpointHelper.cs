@@ -207,6 +207,8 @@ namespace PluginHubspot.API.Utility
 
             foreach (var data in dataJson)
             {
+                
+                
                 if (!UDFFields.Contains(data.Key))
                 {
                     payload.Add(data.Key, data.Value);
@@ -234,6 +236,7 @@ namespace PluginHubspot.API.Utility
                 }
 
                 var userDefinedFieldElements = JsonConvert.SerializeObject(userDefinedFieldList);
+                
                 // string userDefinedFieldElement = "";
                 //
                 // userDefinedFieldElement += "[";

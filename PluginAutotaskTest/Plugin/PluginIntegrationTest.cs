@@ -27,6 +27,10 @@ namespace PluginHubspotTest.Plugin
                 : new Settings
                 {
                     // add to test
+                    ApiZone = @"",
+                    UserName = @"",
+                    Secret = @"",
+                    ApiIntegrationCode = @""
                 };
         }
 
@@ -413,7 +417,7 @@ namespace PluginHubspotTest.Plugin
                         DataJson = 
                             "{" +
                                 "\"id\": \"29881931\"," +
-                                "\"Domains\": \"testdomain1.com\"," +
+                                "\"Domains\": \"test\\\"domain1.com\"," +
                                 "\"Email2AT Domains\": \"testdomain2.com\"" +
                             "}"
                     }

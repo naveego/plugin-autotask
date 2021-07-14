@@ -12,8 +12,8 @@
   "arch": "$GOARCH",
   "canProduceMultipleSchemas": true,
   "canAcceptQueryBasedSchemas": false,
-  "canUseOAuth": true,
-  "canWrite": false,
+  "canUseOAuth": false,
+  "canWrite": true,
   "canConfigure": true,
   "querySchema": {
     "ui": {
