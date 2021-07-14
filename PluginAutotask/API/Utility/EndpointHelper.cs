@@ -134,7 +134,7 @@ namespace PluginHubspot.API.Utility
             do
             {
                 var response = new HttpResponseMessage();
-                if (!string.IsNullOrWhiteSpace(nextPageUrl))
+                if (!string.IsNullOrWhiteSpace(nextPageUrl) && path != nextPageUrl)
                 {
                     path = nextPageUrl;
                     response = await apiClient.GetAsync(path, true);
@@ -160,9 +160,10 @@ namespace PluginHubspot.API.Utility
 
                     foreach (var field in item)
                     {
+                        
                         if (field.Key != "userDefinedFields")
                         {
-                            recordMap[field.Key] = field.Value?.ToString() ?? "";
+                            recordMap[field.Key] = field.Value?.ToString() ?? "null";
                         }
                         else
                         {
@@ -172,7 +173,7 @@ namespace PluginHubspot.API.Utility
 
                                 foreach (var udfField in udfFields)
                                 {
-                                    recordMap[udfField.Name] = udfField.Value?.ToString() ?? "";
+                                    recordMap[udfField.Name] = udfField.Value?.ToString() ?? "null";
                                 }
                             }
                             //deserialize field.value
@@ -183,9 +184,16 @@ namespace PluginHubspot.API.Utility
                         Action = Record.Types.Action.Upsert,
                         DataJson = JsonConvert.SerializeObject(recordMap)
                     };
-
                 }
-            nextPageUrl = content.PageDetails["nextPageUrl"].ToString();
+
+                if (content.PageDetails["nextPageUrl"] != null)
+                {
+                    nextPageUrl = content.PageDetails["nextPageUrl"].ToString();
+                }
+                else
+                {
+                    nextPageUrl = "";
+                }
             } while (!string.IsNullOrWhiteSpace(nextPageUrl));
         }
 

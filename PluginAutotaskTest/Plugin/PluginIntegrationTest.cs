@@ -47,7 +47,7 @@ namespace PluginHubspotTest.Plugin
         private Schema GetTestSchema(string endpointId = null, string id = "test", string name = "test")
         {
             Endpoint endpoint = endpointId == null
-                ? endpoint = EndpointHelper.GetEndpointForId("Companies")
+                ? endpoint = EndpointHelper.GetEndpointForId("Contacts")
                 : EndpointHelper.GetEndpointForId(endpointId);
 
 
