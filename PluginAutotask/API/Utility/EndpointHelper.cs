@@ -292,17 +292,18 @@ namespace PluginHubspot.API.Utility
 
             var properties = new List<Property>();
 
-            foreach (var companyProperty in endpointPropertyMetadataWrapper.Fields)
+            foreach (var property in endpointPropertyMetadataWrapper.Fields)
             {
                 properties.Add(new Property
                 {
-                    Id = companyProperty.Name,
-                    Name = companyProperty.Name,
+                    Id = property.Name,
+                    Name = property.Name,
                     Description = "",
-                    Type = Discover.Discover.GetPropertyType(companyProperty.Type),
-                    TypeAtSource = companyProperty.Type,
-                    IsKey = Boolean.Parse(companyProperty.IsKey),
-                    IsNullable = !Boolean.Parse(companyProperty.IsRequired),
+                    Type = Discover.Discover.GetPropertyType(property.Type),
+                    TypeAtSource = property.Type,
+                    //IsKey = Boolean.Parse(companyProperty.IsKey),
+                    IsKey = property.Name == "id",
+                    IsNullable = !Boolean.Parse(property.IsRequired),
                     IsCreateCounter = false,
                     IsUpdateCounter = false,
                 });
