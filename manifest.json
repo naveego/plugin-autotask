@@ -45,7 +45,7 @@
         "ApiZone" : {
           "type": "string",
           "title": "ApiZone",
-          "description": "API Zone - i.e. Example is \"webservices1\""
+          "description": "API Zone - i.e. \"webservices1\""
         },
         "ApiIntegrationCode": {
           "type": "string",
