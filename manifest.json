@@ -6,7 +6,7 @@
   "versionDescription": "Version 0.0.1",
   "version": "0.0.1",
   "iconFile": "icon.png",
-  "executable": "PluginAutoTask",
+  "executable": "PluginAutotask",
   "kind": "publisher",
   "os": "$GOOS",
   "arch": "$GOARCH",
