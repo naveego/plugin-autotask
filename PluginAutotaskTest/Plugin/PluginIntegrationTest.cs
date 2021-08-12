@@ -47,7 +47,7 @@ namespace PluginHubspotTest.Plugin
         private Schema GetTestSchema(string endpointId = null, string id = "test", string name = "test")
         {
             Endpoint endpoint = endpointId == null
-                ? endpoint = EndpointHelper.GetEndpointForId("Contacts")
+                ? EndpointHelper.GetEndpointForId("Tickets")
                 : EndpointHelper.GetEndpointForId(endpointId);
 
 
@@ -293,7 +293,7 @@ namespace PluginHubspotTest.Plugin
             }
 
             // assert
-            Assert.Equal(500, records.Count);
+            Assert.Equal(1782, records.Count);
 
             var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
             // Assert.Equal("~", record["tilde"]);
@@ -378,7 +378,7 @@ namespace PluginHubspotTest.Plugin
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
 
-            var schema = GetTestSchema("Companies");
+            var schema = GetTestSchema("Projects");
 
             var connectRequest = GetConnectSettings();
 

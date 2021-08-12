@@ -39,7 +39,38 @@ namespace PluginHubspot.API.Utility.EndpointHelperEndpoints
         {
             [JsonProperty("properties")] public Dictionary<string, TaskProperty> Properties { get; set; }
         }
+        private class UDFPropertyWrapper
+        {
+            [JsonProperty("items")]
+            public List<UDFList> Items { get; set; }
+        }
 
+        private class UDFList
+        {
+            [JsonProperty("userDefinedFields")]
+            public List<UDFListItem> UserDefinedFields { get; set; }
+        }
+        private class UDFListByRoot
+        {
+            [JsonProperty("root")]
+            public List<UDFListItem> UserDefinedFields { get; set; }
+        }
+
+        private class UDFListItem
+        {
+            [JsonProperty("name")]
+            public string Name { get; set; }
+            
+            [JsonProperty("value")]
+            public string Value { get; set; }
+        }
+        
+        private class UDFListItemRootless
+        {
+            public string Name { get; set; }
+            
+            public string Value { get; set; }
+        }
         private class TaskProperty
         {
             [JsonProperty("value")] public object Value { get; set; }

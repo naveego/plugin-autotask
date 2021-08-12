@@ -27,7 +27,7 @@ namespace PluginHubspot.API.Utility
             TicketsEndpointHelper.TicketsEndpoints.ToList().ForEach(x => Endpoints.TryAdd(x.Key, x.Value));
             TasksEndpointHelper.TasksEndpoints.ToList().ForEach(x => Endpoints.TryAdd(x.Key, x.Value));
             ProjectsEndpointHelper.ProjectsEndpoints.ToList().ForEach(x => Endpoints.TryAdd(x.Key, x.Value));
-            AttachmentInfoEndpointHelper.AttachmentInfoEndpoints.ToList().ForEach(x => Endpoints.TryAdd(x.Key, x.Value));
+            //AttachmentInfoEndpointHelper.AttachmentInfoEndpoints.ToList().ForEach(x => Endpoints.TryAdd(x.Key, x.Value));
             
         }
 
@@ -217,8 +217,6 @@ namespace PluginHubspot.API.Utility
 
             foreach (var data in dataJson)
             {
-                
-                
                 if (!UDFFields.Contains(data.Key))
                 {
                     payload.Add(data.Key, data.Value);
@@ -247,31 +245,10 @@ namespace PluginHubspot.API.Utility
 
                 var userDefinedFieldElements = JsonConvert.SerializeObject(userDefinedFieldList);
                 
-                // string userDefinedFieldElement = "";
-                //
-                // userDefinedFieldElement += "[";
-                // foreach (var field in payloadUDF)
-                // {
-                //     userDefinedFieldElement += "{";
-                //
-                //     userDefinedFieldElement += $"\"Name\": \"{field.Key}\",";
-                //     userDefinedFieldElement += $"\"Value\": \"{field.Value}\"";
-                //
-                //     userDefinedFieldElement += "},";
-                // }
-                //
-                // userDefinedFieldElement = userDefinedFieldElement.TrimEnd(',');
-                // userDefinedFieldElement += "]";
-
                 payload.Add("userDefinedFields", userDefinedFieldElements);
             }
 
             var payloadString = JsonConvert.SerializeObject(payload);
-
-            //Remove some serialize side-effects
-            // payloadString = payloadString.Replace("\"[", "[");
-            // payloadString = payloadString.Replace("]\"", "]");
-            // payloadString = payloadString.Replace("\\", "");
 
             var response = await apiClient.PatchAsync(BasePath, payloadString);
 

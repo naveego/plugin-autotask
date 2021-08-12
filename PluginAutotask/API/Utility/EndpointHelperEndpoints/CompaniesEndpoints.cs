@@ -225,70 +225,70 @@ namespace PluginHubspot.API.Utility.EndpointHelperEndpoints
                 return response.StatusCode.ToString();
             }
             
-            public async IAsyncEnumerable<Record> ReadRecordsAsync(IApiClient apiClient,
-                DateTime? lastReadTime = null, TaskCompletionSource<DateTime>? tcs = null, bool isDiscoverRead = false)
-            {
-                string path = $"{AllPath.TrimStart('/')}";
-                string nextPageUrl = "";
-                
-                do
-                {
-                    var response = new HttpResponseMessage();
-                    if (!string.IsNullOrWhiteSpace(nextPageUrl))
-                    {
-                        path = nextPageUrl;
-                        response = await apiClient.GetAsync(path, true);
-                    }
-                    else
-                    {
-                        response = await apiClient.GetAsync(path);
-                    }
-                    
-                    response.EnsureSuccessStatusCode();
-
-                    var companiesResponse =
-                        JsonConvert.DeserializeObject<CompaniesResponseWrapper>(await response.Content.ReadAsStringAsync());
-
-                    if (companiesResponse.Companies.Count == 0)
-                    {
-                        yield break;
-                    }
-
-                    foreach (var company in companiesResponse.Companies)
-                    {
-                        var recordMap = new Dictionary<string, object>();
-
-                        foreach (var field in company)
-                        {
-                            if (field.Key != "userDefinedFields")
-                            {
-                                recordMap[field.Key] = field.Value?.ToString() ?? "";
-                            }
-                            else
-                            {
-                                if (!string.IsNullOrWhiteSpace(field.Value.ToString()))
-                                {
-                                    var udfFields = JsonConvert.DeserializeObject<List<UDFListItemRootless>>(field.Value.ToString());
-
-                                    foreach (var udfField in udfFields)
-                                    {
-                                        recordMap[udfField.Name] = udfField.Value?.ToString() ?? "";
-                                    }
-
-                                }
-                                //deserialize field.value
-                            }
-                        }
-
-                        
-                        yield return new Record
-                        {
-                            Action = Record.Types.Action.Upsert,
-                            DataJson = JsonConvert.SerializeObject(recordMap)
-                        };
-                    }
-                } while (!string.IsNullOrWhiteSpace(nextPageUrl));
-            }
+            // public async IAsyncEnumerable<Record> ReadRecordsAsync(IApiClient apiClient,
+            //     DateTime? lastReadTime = null, TaskCompletionSource<DateTime>? tcs = null, bool isDiscoverRead = false)
+            // {
+            //     string path = $"{AllPath.TrimStart('/')}";
+            //     string nextPageUrl = "";
+            //     
+            //     do
+            //     {
+            //         var response = new HttpResponseMessage();
+            //         if (!string.IsNullOrWhiteSpace(nextPageUrl))
+            //         {
+            //             path = nextPageUrl;
+            //             response = await apiClient.GetAsync(path, true);
+            //         }
+            //         else
+            //         {
+            //             response = await apiClient.GetAsync(path);
+            //         }
+            //         
+            //         response.EnsureSuccessStatusCode();
+            //
+            //         var companiesResponse =
+            //             JsonConvert.DeserializeObject<CompaniesResponseWrapper>(await response.Content.ReadAsStringAsync());
+            //
+            //         if (companiesResponse.Companies.Count == 0)
+            //         {
+            //             yield break;
+            //         }
+            //
+            //         foreach (var company in companiesResponse.Companies)
+            //         {
+            //             var recordMap = new Dictionary<string, object>();
+            //
+            //             foreach (var field in company)
+            //             {
+            //                 if (field.Key != "userDefinedFields")
+            //                 {
+            //                     recordMap[field.Key] = field.Value?.ToString() ?? "";
+            //                 }
+            //                 else
+            //                 {
+            //                     if (!string.IsNullOrWhiteSpace(field.Value.ToString()))
+            //                     {
+            //                         var udfFields = JsonConvert.DeserializeObject<List<UDFListItemRootless>>(field.Value.ToString());
+            //
+            //                         foreach (var udfField in udfFields)
+            //                         {
+            //                             recordMap[udfField.Name] = udfField.Value?.ToString() ?? "";
+            //                         }
+            //
+            //                     }
+            //                     //deserialize field.value
+            //                 }
+            //             }
+            //
+            //             
+            //             yield return new Record
+            //             {
+            //                 Action = Record.Types.Action.Upsert,
+            //                 DataJson = JsonConvert.SerializeObject(recordMap)
+            //             };
+            //         }
+            //     } while (!string.IsNullOrWhiteSpace(nextPageUrl));
+            // }
         }
 
         public static readonly Dictionary<string, Endpoint> CompaniesEndpoints = new Dictionary<string, Endpoint>
