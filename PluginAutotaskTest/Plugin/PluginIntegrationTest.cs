@@ -224,7 +224,7 @@ namespace PluginHubspotTest.Plugin
             
             //
             var schema = response.Schemas[0];
-            Assert.Equal(59, schema.Properties.Count);
+            Assert.Equal(111, schema.Properties.Count);
 
             var property = schema.Properties[0];
             
@@ -259,7 +259,7 @@ namespace PluginHubspotTest.Plugin
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
 
-            var schema = GetTestSchema();
+            var schema = GetTestSchema("Contracts");
 
             var connectRequest = GetConnectSettings();
 
@@ -293,7 +293,7 @@ namespace PluginHubspotTest.Plugin
             }
 
             // assert
-            Assert.Equal(1782, records.Count);
+            Assert.Equal(7045, records.Count);
 
             var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
             // Assert.Equal("~", record["tilde"]);

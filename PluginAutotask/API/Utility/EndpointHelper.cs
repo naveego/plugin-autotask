@@ -24,6 +24,7 @@ namespace PluginHubspot.API.Utility
         {
             ContactsEndpointHelper.ContactsEndpoints.ToList().ForEach(x => Endpoints.TryAdd(x.Key, x.Value));
             CompaniesEndpointHelper.CompaniesEndpoints.ToList().ForEach(x => Endpoints.TryAdd(x.Key, x.Value));
+            ContractsEndpointHelper.ContractsEndpoints.ToList().ForEach(x => Endpoints.TryAdd(x.Key, x.Value));
             TicketsEndpointHelper.TicketsEndpoints.ToList().ForEach(x => Endpoints.TryAdd(x.Key, x.Value));
             TasksEndpointHelper.TasksEndpoints.ToList().ForEach(x => Endpoints.TryAdd(x.Key, x.Value));
             ProjectsEndpointHelper.ProjectsEndpoints.ToList().ForEach(x => Endpoints.TryAdd(x.Key, x.Value));
@@ -286,7 +287,7 @@ namespace PluginHubspot.API.Utility
                 });
             }
             
-            var UDFPath = $"atservicesrest/v1.0/{endpointId}/query?search={{\"MaxRecords\":1, \"filter\":[{{\"op\":\"exist\",\"field\":\"id\"}}]}}";
+            var UDFPath = $"atservicesrest/v1.0/{endpointId}/query?search={{\"MaxRecords\":100, \"filter\":[{{\"op\":\"exist\",\"field\":\"id\"}}]}}";
             
             var udfResponse = await apiClient.GetAsync(UDFPath);
 
@@ -294,26 +295,35 @@ namespace PluginHubspot.API.Utility
             
             var udfPropertyWrapper = JsonConvert.DeserializeObject<UDFPropertyWrapper>(await udfResponse.Content.ReadAsStringAsync());
 
-            foreach (var udfField in udfPropertyWrapper.Items[0].UserDefinedFields)
+            foreach (var item in udfPropertyWrapper.Items)
             {
-                try
+                foreach (var udfField in item.UserDefinedFields)
                 {
-                    properties.Add(new Property
+                    try
                     {
-                        Id = udfField.Name,
-                        Name = udfField.Name,
-                        Description = "",
-                        Type = PropertyType.String,
-                        TypeAtSource = "UserDefinedField-String",
-                        IsKey = false,
-                        IsNullable = true,
-                        IsCreateCounter = false,
-                        IsUpdateCounter = false,
-                    });
-                }
-                catch (Exception e)
-                {
-                    var debug = e.Message;
+                        var property = new Property
+                        {
+                            Id = udfField.Name,
+                            Name = udfField.Name,
+                            Description = "UserDefinedField",
+                            Type = PropertyType.String,
+                            TypeAtSource = "string",
+                            IsKey = false,
+                            IsNullable = true,
+                            IsCreateCounter = false,
+                            IsUpdateCounter = false,
+                        };
+
+                        if (!properties.Contains(property))
+                        {
+                            properties.Add(property);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        var debug = e.Message;
+                    }
+
                 }
             }
             
