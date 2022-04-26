@@ -82,10 +82,10 @@ namespace PluginHubspot.API.Utility
 
         private class UDFListItem
         {
-            [JsonProperty("Name")]
+            [JsonProperty("name")]
             public string Name { get; set; }
             
-            [JsonProperty("Value")]
+            [JsonProperty("value")]
             public string Value { get; set; }
         }
         
@@ -205,7 +205,7 @@ namespace PluginHubspot.API.Utility
 
             foreach (var field in schema.Properties)
             {
-                if (field.TypeAtSource == "UserDefinedField-String")
+                if (field.Description == "UserDefinedField")
                 {
                     UDFFields.Add(field.Name);
                 }
