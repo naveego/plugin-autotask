@@ -1,15 +1,54 @@
-namespace PluginHubspot.API.Utility
+using System.Collections.Generic;
+
+namespace PluginAutotask.API.Utility
 {
     public static class Constants
     {
-        //Example: "https://webservices1.autotask.net/atservicesrest/v1.0/Companies/query?search={ "filter":[{"op" : "exist", "field" : "id" }]}"
-        
-        //webservices1 must become user input
-        public static string HttpsPrefix = "https://";
-        public static string DomainApiUrl = "autotask.net/";
-        public static string TestConnectionPath = "/atservicesrest/v1.0/Companies/0";
-        public static string CustomProperty = "CustomProperty";
+        public static string TestConnectionPath = "Companies/0";
+        public static string GetAllRecordsQuery = "{\"Filter\":[{\"field\":\"Id\",\"op\":\"gte\",\"value\":0}]}";
+        public static string UserDefinedProperty = "UserDefinedProperty";
         public static string EmptySchemaDescription = "This schema has no properties. This is likely due to to there being no data.";
-        
+
+        public static List<string> EntitiesList { get; set; } = new List<string>() {
+            "BillingCodes",
+            "BillingItems",
+            "ContactBillingProductAssociations",
+            "ContactGroupContacts",
+            "ContactGroups",
+            "ContractBillingRules",
+            "ContractCharges",
+            "ContractRates",
+            "ContractRoleCosts",
+            "ContractServiceBundles",
+            "ContractServiceBundleUnits",
+            "ContractServices",
+            "ContractServiceUnits",
+            "Holidays",
+            "HolidaySets",
+            "Invoices",
+            "Products",
+            "ResourceDailyAvailabilities",
+            "ResourceRoleQueues",
+            "ResourceRoles",
+            "Resources",
+            "ResourceServiceDeskRoles",
+            "Roles",
+            "ServiceBundles",
+            "ServiceBundleServices",
+            "ServiceLevelAgreementResults",
+            "Services",
+            "SubscriptionPeriods",
+            "Subscriptions",
+            "SurveyResults",
+            "Surveys",
+            "TaskSecondaryResources",
+            "TicketCategories",
+            "TicketCharges",
+            "TicketHistory",
+            "TicketNotes",
+            "TimeEntries",
+            "UserDefinedFieldDefinitions",
+            "UserDefinedFieldListItems",
+        };
     }
 }

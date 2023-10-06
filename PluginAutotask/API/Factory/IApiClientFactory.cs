@@ -1,6 +1,6 @@
-using PluginHubspot.Helper;
+using PluginAutotask.Helper;
 
-namespace PluginHubspot.API.Factory
+namespace PluginAutotask.API.Factory
 {
     public interface IApiClientFactory
     {

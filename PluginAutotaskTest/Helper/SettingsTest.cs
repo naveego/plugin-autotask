@@ -1,8 +1,8 @@
 using System;
-using PluginHubspot.Helper;
+using PluginAutotask.Helper;
 using Xunit;
 
-namespace PluginHubspotTest.Helper
+namespace PluginAutotaskTest.Helper
 {
     public class SettingsTest
     {

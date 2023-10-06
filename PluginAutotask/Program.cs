@@ -4,7 +4,7 @@ using Grpc.Core;
 using Aunalytics.Sdk.Logging;
 using Aunalytics.Sdk.Plugins;
 
-namespace PluginHubspot
+namespace PluginAutotask
 {
     class Program
     {

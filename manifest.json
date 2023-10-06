@@ -13,7 +13,7 @@
   "canProduceMultipleSchemas": true,
   "canAcceptQueryBasedSchemas": false,
   "canUseOAuth": false,
-  "canWrite": true,
+  "canWrite": false,
   "canConfigure": true,
   "querySchema": {
     "ui": {

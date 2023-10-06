@@ -1,110 +1,119 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Aunalytics.Sdk.Logging;
 using Aunalytics.Sdk.Plugins;
 using Newtonsoft.Json;
-using PluginHubspot.API.Factory;
-using PluginHubspot.API.Utility;
-using PluginHubspot.Helper;
+using PluginAutotask.API.Factory;
+using PluginAutotask.API.Utility;
+using PluginAutotask.DataContracts;
+using PluginAutotask.Helper;
 
-namespace PluginHubspot.API.Discover
+namespace PluginAutotask.API.Discover
 {
     public static partial class Discover
     {
-        public static async IAsyncEnumerable<Schema> GetAllSchemas(IApiClient apiClient, Settings settings,
-            int sampleSize = 5)
+        public static async IAsyncEnumerable<Schema> GetAllSchemas(IApiClient apiClient, int sampleSize = 5)
         {
-            var allEndpoints = EndpointHelper.GetAllEndpoints();
-
-            
-            
-            foreach (var endpoint in allEndpoints.Values)
+            foreach (var entity in Constants.EntitiesList) 
             {
                 // base schema to be added to
                 var schema = new Schema
                 {
-                    Id = endpoint.Id,
-                    Name = endpoint.Name,
+                    Id = entity,
+                    Name = entity,
                     Description = "",
-                    PublisherMetaJson = JsonConvert.SerializeObject(endpoint),
-                    DataFlowDirection = endpoint.GetDataFlowDirection()
+                    DataFlowDirection = Schema.Types.DataFlowDirection.Read,
                 };
 
-                schema = await GetSchemaForEndpoint(apiClient, schema, endpoint);
+                schema = await AddPropertiesForEntity(apiClient, schema);
+                schema = await AddSampleAndCount(apiClient, schema, sampleSize);
 
-                yield return await AddSampleAndCount(apiClient, schema, settings, sampleSize, endpoint);
+                yield return schema;
             }
         }
 
-        private static async Task<Schema> AddSampleAndCount(IApiClient apiClient, Schema schema, Settings settings,
-            int sampleSize, Endpoint? endpoint)
+        private static async Task<Schema> AddPropertiesForEntity(IApiClient apiClient, Schema schema)
         {
-            if (endpoint == null)
-            {
-                return schema;
-            }
-
-            // add sample and count
-            var records = Read.Read.ReadRecordsAsync(apiClient, schema, settings).Take(sampleSize);
-            schema.Sample.AddRange(await records.ToListAsync());
-            schema.Count = await GetCountOfRecords(apiClient, endpoint);
-
-            return schema;
-        }
-
-        private static async Task<Schema> GetSchemaForEndpoint(IApiClient apiClient, Schema schema, Endpoint? endpoint)
-        {
-            
-            if (endpoint == null)
-            {
-                return schema;
-            }
-            
-            if (endpoint.ShouldGetStaticSchema)
-            {
-                return await endpoint.GetStaticSchemaAsync(apiClient, schema);
-            }
-
-            var recordsListRaw = await endpoint.ReadRecordsAsync(apiClient, null, null, true).Take(100).ToListAsync();
-            var recordsList = recordsListRaw
-                .Select(r => JsonConvert.DeserializeObject<Dictionary<string, object>>(r.DataJson))
-                .ToList();
-
-            var types = GetPropertyTypesFromRecords(recordsList);
-
-            var record = recordsList.FirstOrDefault();
-
             var properties = new List<Property>();
 
-            if (record != null)
-            {
-                foreach (var recordKey in record.Keys)
-                {
-                    var property = new Property
-                    {
-                        Id = recordKey,
-                        Name = recordKey,
-                        Type = types[recordKey],
-                        IsKey = endpoint.PropertyKeys.Contains(recordKey),
-                        IsCreateCounter = false,
-                        IsUpdateCounter = false,
-                        TypeAtSource = await endpoint.IsCustomProperty(apiClient, recordKey)
-                            ? Constants.CustomProperty
-                            : "",
-                        IsNullable = true
-                    };
+            var fieldsResult = await apiClient.GetAsync($"/{schema.Id}/entityInformation/fields");
 
-                    properties.Add(property);
-                }
+            try
+            {
+                fieldsResult.EnsureSuccessStatusCode();
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, e.Message);
+                throw;
+            }
+            
+            var fieldsWrapper = JsonConvert.DeserializeObject<FieldsWrapper>(await fieldsResult.Content.ReadAsStringAsync());
+            foreach (var field in fieldsWrapper.Fields)
+            {
+                var property = new Property()
+                {
+                    Id = field.Name,
+                    Name = field.Name,
+                    Description = "",
+                    Type = GetPropertyType(field.DataType),
+                    TypeAtSource = field.DataType, 
+                    IsKey = field.Name.ToLower().Equals("id"),
+                    IsNullable = !field.IsRequired,
+                    IsCreateCounter = false,
+                    IsUpdateCounter = false,
+                    PublisherMetaJson = "",
+                };
+
+                properties.Add(property);
+            }
+
+            fieldsResult = await apiClient.GetAsync($"/{schema.Id}/entityInformation/userDefinedFields");
+
+            try
+            {
+                fieldsResult.EnsureSuccessStatusCode();
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, e.Message);
+                throw;
+            }
+            
+            fieldsWrapper = JsonConvert.DeserializeObject<FieldsWrapper>(await fieldsResult.Content.ReadAsStringAsync());
+            foreach (var field in fieldsWrapper.Fields)
+            {
+                var property = new Property()
+                {
+                    Id = field.Name,
+                    Name = field.Name,
+                    Description = "",
+                    Type = GetPropertyType(field.DataType),
+                    TypeAtSource = field.DataType, 
+                    IsKey = field.Name.ToLower().Equals("id"),
+                    IsNullable = !field.IsRequired,
+                    IsCreateCounter = false,
+                    IsUpdateCounter = false,
+                    PublisherMetaJson = "",
+                };
+
+                properties.Add(property);
             }
 
             schema.Properties.Clear();
             schema.Properties.AddRange(properties);
 
-            if (schema.Properties.Count == 0)
-            {
-                schema.Description = Constants.EmptySchemaDescription;
-            }
+            return schema;
+        }
+
+        private static async Task<Schema> AddSampleAndCount(IApiClient apiClient, Schema schema, int sampleSize)
+        {
+            // add sample and count
+            var records = Read.Read.ReadRecordsAsync(apiClient, schema).Take(sampleSize);
+            schema.Sample.AddRange(await records.ToListAsync());
+            schema.Count = await GetCountOfRecords(apiClient, schema);
 
             return schema;
         }

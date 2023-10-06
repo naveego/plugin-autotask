@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 using Grpc.Core;
 using Aunalytics.Sdk.Plugins;
 using Newtonsoft.Json;
-using PluginHubspot.API.Read;
-using PluginHubspot.API.Utility;
-using PluginHubspot.DataContracts;
-using PluginHubspot.Helper;
+using PluginAutotask.API.Read;
+using PluginAutotask.API.Utility;
+using PluginAutotask.DataContracts;
+using PluginAutotask.Helper;
 using Xunit;
 using Record = Aunalytics.Sdk.Plugins.Record;
 
-namespace PluginHubspotTest.Plugin
+namespace PluginAutotaskTest.Plugin
 {
     public class PluginIntegrationTest
     {
@@ -65,7 +65,7 @@ namespace PluginHubspotTest.Plugin
             // setup
             Server server = new Server
             {
-                Services = {Publisher.BindService(new PluginHubspot.Plugin.Plugin())},
+                Services = {Publisher.BindService(new PluginAutotask.Plugin.Plugin())},
                 Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
             };
             server.Start();
@@ -103,7 +103,7 @@ namespace PluginHubspotTest.Plugin
             // setup
             Server server = new Server
             {
-                Services = {Publisher.BindService(new PluginHubspot.Plugin.Plugin())},
+                Services = {Publisher.BindService(new PluginAutotask.Plugin.Plugin())},
                 Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
             };
             server.Start();
@@ -135,7 +135,7 @@ namespace PluginHubspotTest.Plugin
             // setup
             Server server = new Server
             {
-                Services = {Publisher.BindService(new PluginHubspot.Plugin.Plugin())},
+                Services = {Publisher.BindService(new PluginAutotask.Plugin.Plugin())},
                 Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
             };
             server.Start();
@@ -191,7 +191,7 @@ namespace PluginHubspotTest.Plugin
             // setup
             Server server = new Server
             {
-                Services = {Publisher.BindService(new PluginHubspot.Plugin.Plugin())},
+                Services = {Publisher.BindService(new PluginAutotask.Plugin.Plugin())},
                 Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
             };
             server.Start();
@@ -249,7 +249,7 @@ namespace PluginHubspotTest.Plugin
             // setup
             Server server = new Server
             {
-                Services = {Publisher.BindService(new PluginHubspot.Plugin.Plugin())},
+                Services = {Publisher.BindService(new PluginAutotask.Plugin.Plugin())},
                 Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
             };
             server.Start();
@@ -310,7 +310,7 @@ namespace PluginHubspotTest.Plugin
             // setup
             Server server = new Server
             {
-                Services = {Publisher.BindService(new PluginHubspot.Plugin.Plugin())},
+                Services = {Publisher.BindService(new PluginAutotask.Plugin.Plugin())},
                 Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
             };
             server.Start();
@@ -368,7 +368,7 @@ namespace PluginHubspotTest.Plugin
             // setup
             Server server = new Server
             {
-                Services = {Publisher.BindService(new PluginHubspot.Plugin.Plugin())},
+                Services = {Publisher.BindService(new PluginAutotask.Plugin.Plugin())},
                 Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
             };
             server.Start();

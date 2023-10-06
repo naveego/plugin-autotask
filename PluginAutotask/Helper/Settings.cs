@@ -1,6 +1,6 @@
 using System;
 
-namespace PluginHubspot.Helper
+namespace PluginAutotask.Helper
 {
     public class Settings
     {
