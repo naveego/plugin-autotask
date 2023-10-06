@@ -4,14 +4,14 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
-using Naveego.Sdk.Plugins;
+using Aunalytics.Sdk.Plugins;
 using Newtonsoft.Json;
 using PluginHubspot.API.Read;
 using PluginHubspot.API.Utility;
 using PluginHubspot.DataContracts;
 using PluginHubspot.Helper;
 using Xunit;
-using Record = Naveego.Sdk.Plugins.Record;
+using Record = Aunalytics.Sdk.Plugins.Record;
 
 namespace PluginHubspotTest.Plugin
 {

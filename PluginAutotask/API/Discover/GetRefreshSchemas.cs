@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using Google.Protobuf.Collections;
-using Naveego.Sdk.Plugins;
+using Aunalytics.Sdk.Plugins;
 using PluginHubspot.API.Factory;
 using PluginHubspot.API.Utility;
 using PluginHubspot.Helper;

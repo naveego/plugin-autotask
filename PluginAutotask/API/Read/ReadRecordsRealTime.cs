@@ -1,8 +1,8 @@
 using System;
 using System.Threading.Tasks;
 using Grpc.Core;
-using Naveego.Sdk.Logging;
-using Naveego.Sdk.Plugins;
+using Aunalytics.Sdk.Logging;
+using Aunalytics.Sdk.Plugins;
 using Newtonsoft.Json;
 using PluginHubspot.API.Factory;
 using PluginHubspot.Helper;

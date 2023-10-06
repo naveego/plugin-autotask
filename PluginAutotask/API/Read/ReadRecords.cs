@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Naveego.Sdk.Plugins;
+using Aunalytics.Sdk.Plugins;
 using PluginHubspot.API.Factory;
 using PluginHubspot.API.Utility;
 using PluginHubspot.Helper;
