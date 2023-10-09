@@ -6,9 +6,9 @@ namespace PluginAutotask.API.Utility
 {
     public static partial class Utility
     {
-        public static Query GetQueryForSchema(Schema schema)
+        public static Query GetQueryForSchemaId(string schemaId)
         {
-            switch (schema.Id)
+            switch (schemaId)
             {
                 case "TicketHistory":
                     return Constants.GetAllRecordsQueryTicketHistory;

@@ -227,14 +227,14 @@ namespace PluginAutotask.Plugin
             try
             {
                 var schema = request.Schema;
-                var limit = request.Limit;
+                var limit = checked((int) request.Limit);;
                 var limitFlag = request.Limit != 0;
                 var jobId = request.JobId;
                 long recordsCount = 0;
 
                 Logger.SetLogPrefix(jobId);
                 
-                var records = Read.ReadRecordsAsync(_apiClient, schema);
+                var records = Read.ReadRecordsAsync(_apiClient, schema, limit);
 
                 await foreach (var record in records)
                 {

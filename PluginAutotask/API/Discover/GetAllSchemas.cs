@@ -115,7 +115,7 @@ namespace PluginAutotask.API.Discover
         private static async Task<Schema> AddSampleAndCount(IApiClient apiClient, Schema schema, int sampleSize)
         {
             // add sample and count
-            var records = Read.Read.ReadRecordsAsync(apiClient, schema).Take(sampleSize);
+            var records = Read.Read.ReadRecordsAsync(apiClient, schema, sampleSize).Take(sampleSize);
             schema.Sample.AddRange(await records.ToListAsync());
             schema.Count = await GetCountOfRecords(apiClient, schema);
 

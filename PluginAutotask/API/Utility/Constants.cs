@@ -69,7 +69,7 @@ namespace PluginAutotask.API.Utility
             "TaskSecondaryResources",
             "TicketCategories",
             "TicketCharges",
-            // "TicketHistory",
+            "TicketHistory",
             "TicketNotes",
             "TimeEntries",
             "UserDefinedFieldDefinitions",

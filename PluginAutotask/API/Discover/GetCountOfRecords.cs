@@ -12,7 +12,7 @@ namespace PluginAutotask.API.Discover
     {
         public static async Task<Count> GetCountOfRecords(IApiClient apiClient, Schema schema)
         {
-            var query = Utility.Utility.GetQueryForSchema(schema);
+            var query = Utility.Utility.GetQueryForSchemaId(schema.Id);
             var countResult = await apiClient.GetAsync($"/{schema.Id}/query/count?search={JsonConvert.SerializeObject(query)}");
             
             try
