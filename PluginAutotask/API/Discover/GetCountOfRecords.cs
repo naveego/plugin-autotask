@@ -4,7 +4,6 @@ using Aunalytics.Sdk.Logging;
 using Aunalytics.Sdk.Plugins;
 using Newtonsoft.Json;
 using PluginAutotask.API.Factory;
-using PluginAutotask.API.Utility;
 using PluginAutotask.DataContracts;
 
 namespace PluginAutotask.API.Discover
@@ -13,7 +12,8 @@ namespace PluginAutotask.API.Discover
     {
         public static async Task<Count> GetCountOfRecords(IApiClient apiClient, Schema schema)
         {
-            var countResult = await apiClient.GetAsync($"/{schema.Id}/query/count?search={Constants.GetAllRecordsQuery}");
+            var query = Utility.Utility.GetQueryForSchema(schema);
+            var countResult = await apiClient.GetAsync($"/{schema.Id}/query/count?search={JsonConvert.SerializeObject(query)}");
             
             try
             {

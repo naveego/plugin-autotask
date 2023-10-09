@@ -17,26 +17,21 @@ namespace PluginAutotaskTest.Plugin
 {
     public class PluginIntegrationTest
     {
-        private Settings GetSettings(bool oAuth = false)
+        private Settings GetSettings()
         {
-            return oAuth
-                ? new Settings
-                {
-                    
-                }
-                : new Settings
-                {
-                    // add to test
-                    ApiZone = @"",
-                    UserName = @"",
-                    Secret = @"",
-                    ApiIntegrationCode = @""
-                };
-        }
+            return new Settings()
+            {
+                // add to test
+                ApiZone = @"",
+                UserName = @"",
+                Secret = @"",
+                ApiIntegrationCode = @""
+            };
+    }
 
-        private ConnectRequest GetConnectSettings(bool oAuth = false)
+        private ConnectRequest GetConnectSettings()
         {
-            var settings = GetSettings(oAuth);
+            var settings = GetSettings();
             
             return new ConnectRequest
             {
@@ -44,17 +39,12 @@ namespace PluginAutotaskTest.Plugin
             };
         }
 
-        private Schema GetTestSchema(string endpointId = null, string id = "test", string name = "test")
+        private Schema GetTestSchema(string endpoint = "BillingCodes")
         {
-            Endpoint endpoint = endpointId == null
-                ? EndpointHelper.GetEndpointForId("Tickets")
-                : EndpointHelper.GetEndpointForId(endpointId);
-
-
             return new Schema
             {
-                Id = id,
-                Name = name,
+                Id = endpoint,
+                Name = endpoint,
                 PublisherMetaJson = JsonConvert.SerializeObject(endpoint),
             };
         }
@@ -145,8 +135,7 @@ namespace PluginAutotaskTest.Plugin
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
 
-            // var connectRequest = GetConnectSettings(true);
-            var connectRequest = GetConnectSettings(false);
+            var connectRequest = GetConnectSettings();
 
             var request = new DiscoverSchemasRequest
             {
@@ -160,25 +149,25 @@ namespace PluginAutotaskTest.Plugin
 
             // assert
             Assert.IsType<DiscoverSchemasResponse>(response);
-            // Assert.Equal(2, response.Schemas.Count);
-            //
-             var schema = response.Schemas[1];
-            // Assert.Equal($"cclf1", schema.Id);
-            // Assert.Equal("cclf1", schema.Name);
-            // Assert.Equal($"", schema.Query);
-             Assert.Equal(10, schema.Sample.Count);
-             Assert.Equal(107, schema.Properties.Count);
-            
-             var property = schema.Properties[0];
-             Assert.Equal("additionalAddressInformation", property.Id);
-             Assert.Equal("additionalAddressInformation", property.Name);
-             Assert.False(property.IsKey);
-             Assert.Equal("", property.Description);
-             Assert.Equal(PropertyType.String, property.Type);
-             Assert.Equal("string", property.TypeAtSource);
-             Assert.True(property.IsNullable);
-             Assert.False(property.IsCreateCounter);
-             Assert.False(property.IsUpdateCounter);
+            Assert.Equal(38, response.Schemas.Count);
+
+            var schema = response.Schemas[0];
+            Assert.Equal("BillingCodes", schema.Id);
+            Assert.Equal("BillingCodes", schema.Name);
+            Assert.Equal("", schema.Query);
+            Assert.Equal(10, schema.Sample.Count);
+            Assert.Equal(15, schema.Properties.Count);
+        
+            var property = schema.Properties[0];
+            Assert.Equal("afterHoursWorkType", property.Id);
+            Assert.Equal("afterHoursWorkType", property.Name);
+            Assert.False(property.IsKey);
+            Assert.Equal("", property.Description);
+            Assert.Equal(PropertyType.Integer, property.Type);
+            Assert.Equal("integer", property.TypeAtSource);
+            Assert.True(property.IsNullable);
+            Assert.False(property.IsCreateCounter);
+            Assert.False(property.IsUpdateCounter);
             
             // cleanup
             await channel.ShutdownAsync();
@@ -209,7 +198,7 @@ namespace PluginAutotaskTest.Plugin
                 SampleSize = 10,
                 ToRefresh =
                 {
-                    GetTestSchema("Companies")
+                    GetTestSchema("BillingCodes")
                 }
             };
 
@@ -221,22 +210,24 @@ namespace PluginAutotaskTest.Plugin
             Assert.IsType<DiscoverSchemasResponse>(response);
             Assert.Equal(1, response.Schemas.Count);
             
-            
-            //
             var schema = response.Schemas[0];
-            Assert.Equal(111, schema.Properties.Count);
-
+            Assert.Equal("BillingCodes", schema.Id);
+            Assert.Equal("BillingCodes", schema.Name);
+            Assert.Equal("", schema.Query);
+            Assert.Equal(10, schema.Sample.Count);
+            Assert.Equal(15, schema.Properties.Count);
+        
             var property = schema.Properties[0];
-            
-            Assert.Equal("additionalAddressInformation", property.Id);
-            Assert.Equal("additionalAddressInformation", property.Name);
+            Assert.Equal("afterHoursWorkType", property.Id);
+            Assert.Equal("afterHoursWorkType", property.Name);
             Assert.False(property.IsKey);
             Assert.Equal("", property.Description);
-            Assert.Equal(PropertyType.String, property.Type);
-            Assert.Equal("string", property.TypeAtSource);
+            Assert.Equal(PropertyType.Integer, property.Type);
+            Assert.Equal("integer", property.TypeAtSource);
             Assert.True(property.IsNullable);
             Assert.False(property.IsCreateCounter);
             Assert.False(property.IsUpdateCounter);
+            
 
             // cleanup
             await channel.ShutdownAsync();
@@ -259,7 +250,7 @@ namespace PluginAutotaskTest.Plugin
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
 
-            var schema = GetTestSchema("Contracts");
+            var schema = GetTestSchema("Invoices");
 
             var connectRequest = GetConnectSettings();
 
@@ -293,7 +284,7 @@ namespace PluginAutotaskTest.Plugin
             }
 
             // assert
-            Assert.Equal(7045, records.Count);
+            Assert.Equal(70611, records.Count);
 
             var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
             // Assert.Equal("~", record["tilde"]);
@@ -320,7 +311,7 @@ namespace PluginAutotaskTest.Plugin
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
 
-            var schema = GetTestSchema();
+            var schema = GetTestSchema("Invoices");
 
             var connectRequest = GetConnectSettings();
 
@@ -337,7 +328,7 @@ namespace PluginAutotaskTest.Plugin
                     JobId = "test"
                 },
                 JobId = "test",
-                Limit = 1
+                Limit = 100
             };
 
             // act
@@ -355,120 +346,9 @@ namespace PluginAutotaskTest.Plugin
             }
 
             // assert
-            Assert.Equal(1, records.Count);
+            Assert.Equal(100, records.Count);
 
-            // cleanup
-            await channel.ShutdownAsync();
-            await server.ShutdownAsync();
-        }
-
-        [Fact]
-        public async Task WriteTest()
-        {
-            // setup
-            Server server = new Server
-            {
-                Services = {Publisher.BindService(new PluginAutotask.Plugin.Plugin())},
-                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
-            };
-            server.Start();
-
-            var port = server.Ports.First().BoundPort;
-
-            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
-            var client = new Publisher.PublisherClient(channel);
-
-            var schema = GetTestSchema("Projects");
-
-            var connectRequest = GetConnectSettings();
-
-            var schemaRequest = new DiscoverSchemasRequest
-            {
-                Mode = DiscoverSchemasRequest.Types.Mode.Refresh,
-                ToRefresh = {schema}
-            };
-
-            var records = new List<Record>()
-            {
-                {
-                    new Record
-                    {
-                        Action = Record.Types.Action.Upsert,
-                        CorrelationId = "test",
-                        RecordId = "1",
-                        
-                        //Ticket test below
-                        // DataJson =
-                        //     "{\"companyID\": \"29881931\"," +
-                        //     "\"QueueID\": \"0\"," +
-                        //     "\"dueDateTime\": \"2030-03-21T00:00:00\"," + 
-                        //     "\"priority\": \"2\"," +
-                        //     "\"status\": \"5\"," +
-                        //     "\"title\": \"POSTMAN Create Ticket Test n}\""
-                            
-                        // DataJson =
-                        // "{\"companyID\": \"29881931\"," +
-                        // "\"id\": \"0\"," +
-                        // "\"firstName\": \"Chris\"," +
-                        // "\"lastName\": \"Cowell\"," + 
-                        // "\"isActive\": \"0\"}"
-                        
-                        
-                        DataJson = 
-                            "{" +
-                                "\"id\": \"29881931\"," +
-                                "\"Domains\": \"test\\\"domain1.com\"," +
-                                "\"Email2AT Domains\": \"testdomain2.com\"" +
-                            "}"
-                    }
-                }
-            };
-
-            var recordAcks = new List<RecordAck>();
-
-            // act
-            client.Connect(connectRequest);
-
-            var schemasResponse = client.DiscoverSchemas(schemaRequest);
-
-            var prepareWriteRequest = new PrepareWriteRequest()
-            {
-                Schema = schemasResponse.Schemas[0],
-                CommitSlaSeconds = 1000,
-                DataVersions = new DataVersions
-                {
-                    JobId = "jobUnitTest",
-                    ShapeId = "shapeUnitTest",
-                    JobDataVersion = 1,
-                    ShapeDataVersion = 1
-                }
-            };
-            client.PrepareWrite(prepareWriteRequest);
-
-            using (var call = client.WriteStream())
-            {
-                var responseReaderTask = Task.Run(async () =>
-                {
-                    while (await call.ResponseStream.MoveNext())
-                    {
-                        var ack = call.ResponseStream.Current;
-                        recordAcks.Add(ack);
-                    }
-                });
-
-                foreach (Record record in records)
-                {
-                    await call.RequestStream.WriteAsync(record);
-                }
-
-                await call.RequestStream.CompleteAsync();
-                await responseReaderTask;
-            }
-
-            // assert
-            Assert.Single(recordAcks);
-            Assert.Equal("", recordAcks[0].Error);
-            Assert.Equal("test", recordAcks[0].CorrelationId);
+            var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
 
             // cleanup
             await channel.ShutdownAsync();

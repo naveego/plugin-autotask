@@ -36,70 +36,74 @@ namespace PluginAutotask.API.Discover
 
         private static async Task<Schema> AddPropertiesForEntity(IApiClient apiClient, Schema schema)
         {
+            var unknownFieldCount = 1;
             var properties = new List<Property>();
 
-            var fieldsResult = await apiClient.GetAsync($"/{schema.Id}/entityInformation/fields");
-
             try
             {
+                var fieldsResult = await apiClient.GetAsync($"/{schema.Id}/entityInformation/fields");
                 fieldsResult.EnsureSuccessStatusCode();
+
+                var fieldsWrapper = JsonConvert.DeserializeObject<FieldsWrapper>(await fieldsResult.Content.ReadAsStringAsync());
+                foreach (var field in fieldsWrapper.Fields)
+                {
+                    var property = new Property()
+                    {
+                        Id = field.Name,
+                        Name = field.Name,
+                        Description = "",
+                        Type = GetPropertyType(field.DataType),
+                        TypeAtSource = field.DataType, 
+                        IsKey = field.Name.ToLower().Equals("id"),
+                        IsNullable = !field.IsRequired,
+                        IsCreateCounter = false,
+                        IsUpdateCounter = false,
+                        PublisherMetaJson = "",
+                    };
+
+                    properties.Add(property);
+                }
             }
             catch (Exception e)
             {
                 Logger.Error(e, e.Message);
                 throw;
             }
-            
-            var fieldsWrapper = JsonConvert.DeserializeObject<FieldsWrapper>(await fieldsResult.Content.ReadAsStringAsync());
-            foreach (var field in fieldsWrapper.Fields)
-            {
-                var property = new Property()
-                {
-                    Id = field.Name,
-                    Name = field.Name,
-                    Description = "",
-                    Type = GetPropertyType(field.DataType),
-                    TypeAtSource = field.DataType, 
-                    IsKey = field.Name.ToLower().Equals("id"),
-                    IsNullable = !field.IsRequired,
-                    IsCreateCounter = false,
-                    IsUpdateCounter = false,
-                    PublisherMetaJson = "",
-                };
-
-                properties.Add(property);
-            }
-
-            fieldsResult = await apiClient.GetAsync($"/{schema.Id}/entityInformation/userDefinedFields");
 
             try
             {
+                var fieldsResult = await apiClient.GetAsync($"/{schema.Id}/entityInformation/userDefinedFields");
                 fieldsResult.EnsureSuccessStatusCode();
+
+                var fieldsWrapper = JsonConvert.DeserializeObject<FieldsWrapper>(await fieldsResult.Content.ReadAsStringAsync());
+                foreach (var field in fieldsWrapper.Fields)
+                {
+                    var property = new Property()
+                    {
+                        Id = field?.Name ?? $"UNKNOWN_{unknownFieldCount}",
+                        Name = field?.Name ?? $"UNKNOWN_{unknownFieldCount}",
+                        Description = Constants.UserDefinedProperty,
+                        Type = GetPropertyType(field?.DataType),
+                        TypeAtSource = field?.DataType ?? "", 
+                        IsKey = field?.Name?.ToLower()?.Equals("id") ?? false,
+                        IsNullable = !field?.IsRequired ?? true,
+                        IsCreateCounter = false,
+                        IsUpdateCounter = false,
+                        PublisherMetaJson = "",
+                    };
+
+                    properties.Add(property);
+
+                    if (field == null || field.Name == null) 
+                    {
+                        unknownFieldCount++;
+                    }
+                }
             }
             catch (Exception e)
             {
                 Logger.Error(e, e.Message);
                 throw;
-            }
-            
-            fieldsWrapper = JsonConvert.DeserializeObject<FieldsWrapper>(await fieldsResult.Content.ReadAsStringAsync());
-            foreach (var field in fieldsWrapper.Fields)
-            {
-                var property = new Property()
-                {
-                    Id = field.Name,
-                    Name = field.Name,
-                    Description = "",
-                    Type = GetPropertyType(field.DataType),
-                    TypeAtSource = field.DataType, 
-                    IsKey = field.Name.ToLower().Equals("id"),
-                    IsNullable = !field.IsRequired,
-                    IsCreateCounter = false,
-                    IsUpdateCounter = false,
-                    PublisherMetaJson = "",
-                };
-
-                properties.Add(property);
             }
 
             schema.Properties.Clear();

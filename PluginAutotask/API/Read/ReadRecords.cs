@@ -1,21 +1,24 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Aunalytics.Sdk.Logging;
 using Aunalytics.Sdk.Plugins;
 using Newtonsoft.Json;
 using PluginAutotask.API.Factory;
-using PluginAutotask.API.Utility;
 using PluginAutotask.DataContracts;
-using PluginAutotask.Helper;
 
 namespace PluginAutotask.API.Read
 {
     public static partial class Read
     {
-        public static async IAsyncEnumerable<Record> ReadRecordsAsync(IApiClient apiClient, Schema schema) 
+        public static async IAsyncEnumerable<Record> ReadRecordsAsync(IApiClient apiClient, Schema schema, int limit = -1) 
         {
-            var queryResult = await apiClient.GetAsync($"/{schema.Id}/query?search={Constants.GetAllRecordsQuery}");
+            var query = Utility.Utility.GetQueryForSchema(schema);
+            if (limit >= 0) 
+            {
+                query.MaxRecords = limit;
+            }
+
+            var queryResult = await apiClient.GetAsync($"/{schema.Id}/query?search={JsonConvert.SerializeObject(query)}");
                 
             try
             {

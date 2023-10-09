@@ -40,7 +40,8 @@ namespace PluginAutotask.API.Factory
         {
             try
             {
-                await GetAsync(Constants.TestConnectionPath);
+                var response = await GetAsync(Constants.TestConnectionPath);
+                response.EnsureSuccessStatusCode();
             }
             catch (Exception e)
             {
@@ -53,7 +54,7 @@ namespace PluginAutotask.API.Factory
         {
             try
             {
-                var uriBuilder = new UriBuilder($"{BaseApiUrl.TrimEnd('/')}/{path.TrimStart('/')}");
+                var uriBuilder = new UriBuilder($"{BaseApiUrl.TrimEnd('/')}/{path.Replace(BaseApiUrl, "").TrimStart('/')}");
                 var query = HttpUtility.ParseQueryString(uriBuilder.Query);
                 uriBuilder.Query = query.ToString();
                 
@@ -78,7 +79,7 @@ namespace PluginAutotask.API.Factory
         {
             try
             {
-                var uriBuilder = new UriBuilder($"{BaseApiUrl.TrimEnd('/')}/{path.TrimStart('/')}");
+                var uriBuilder = new UriBuilder($"{BaseApiUrl.TrimEnd('/')}/{path.Replace(BaseApiUrl, "").TrimStart('/')}");
                 var query = HttpUtility.ParseQueryString(uriBuilder.Query);
                 uriBuilder.Query = query.ToString();
                 
@@ -104,7 +105,7 @@ namespace PluginAutotask.API.Factory
         {
             try
             {
-                var uriBuilder = new UriBuilder($"{BaseApiUrl.TrimEnd('/')}/{path.TrimStart('/')}");
+                var uriBuilder = new UriBuilder($"{BaseApiUrl.TrimEnd('/')}/{path.Replace(BaseApiUrl, "").TrimStart('/')}");
                 var query = HttpUtility.ParseQueryString(uriBuilder.Query);
                 uriBuilder.Query = query.ToString();
                 
@@ -130,7 +131,7 @@ namespace PluginAutotask.API.Factory
         {
             try
             {
-                var uriBuilder = new UriBuilder($"{BaseApiUrl.TrimEnd('/')}/{path.TrimStart('/')}");
+                var uriBuilder = new UriBuilder($"{BaseApiUrl.TrimEnd('/')}/{path.Replace(BaseApiUrl, "").TrimStart('/')}");
                 var query = HttpUtility.ParseQueryString(uriBuilder.Query);
                 uriBuilder.Query = query.ToString();
                 
@@ -156,7 +157,7 @@ namespace PluginAutotask.API.Factory
         {
             try
             {
-                var uriBuilder = new UriBuilder($"{BaseApiUrl.TrimEnd('/')}/{path.TrimStart('/')}");
+                var uriBuilder = new UriBuilder($"{BaseApiUrl.TrimEnd('/')}/{path.Replace(BaseApiUrl, "").TrimStart('/')}");
                 var query = HttpUtility.ParseQueryString(uriBuilder.Query);
                 uriBuilder.Query = query.ToString();
                 

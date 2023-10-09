@@ -172,7 +172,6 @@ namespace PluginAutotask.Plugin
 
             DiscoverSchemasResponse discoverSchemasResponse = new DiscoverSchemasResponse();
 
-            // only return requested schemas if refresh mode selected
             if (request.Mode == DiscoverSchemasRequest.Types.Mode.All)
             {
                 // get all schemas
@@ -193,6 +192,7 @@ namespace PluginAutotask.Plugin
                 }
             }
 
+            // only return requested schemas if refresh mode selected
             try
             {
                 var refreshSchemas = request.ToRefresh;
