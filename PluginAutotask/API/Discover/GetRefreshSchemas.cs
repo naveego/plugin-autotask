@@ -22,9 +22,11 @@ namespace PluginAutotask.API.Discover
 
                     yield return schema;
                 }
-
-                // TODO: add support for user defined schemas
-                yield return schema;
+                else
+                {
+                    // TODO: add support for user defined schemas
+                    yield return schema;
+                }
             }
         }
     }
