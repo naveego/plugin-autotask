@@ -149,7 +149,7 @@ namespace PluginAutotaskTest.Plugin
 
             // assert
             Assert.IsType<DiscoverSchemasResponse>(response);
-            Assert.Equal(39, response.Schemas.Count);
+            Assert.Equal(68, response.Schemas.Count);
 
             var schema = response.Schemas[0];
             Assert.Equal("BillingCodes", schema.Id);
