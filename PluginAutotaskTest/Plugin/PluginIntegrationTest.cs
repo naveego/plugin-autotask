@@ -302,7 +302,6 @@ namespace PluginAutotaskTest.Plugin
             Assert.False(property.IsCreateCounter);
             Assert.False(property.IsUpdateCounter);
             
-
             // cleanup
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
@@ -361,7 +360,6 @@ namespace PluginAutotaskTest.Plugin
             Assert.Equal(70653, records.Count);
 
             var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
-            // Assert.Equal("~", record["tilde"]);
 
             // cleanup
             await channel.ShutdownAsync();
@@ -487,7 +485,6 @@ namespace PluginAutotaskTest.Plugin
             Assert.Equal(70653, records.Count);
 
             var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
-            // Assert.Equal("~", record["tilde"]);
 
             // cleanup
             await channel.ShutdownAsync();

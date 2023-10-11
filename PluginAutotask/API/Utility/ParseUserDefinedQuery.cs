@@ -29,7 +29,6 @@ namespace PluginAutotask.API.Utility
             }
             catch (Exception e)
             {
-                
                 throw new Exception($"Error parsing filter query: {e.Message}");
             }
         }
