@@ -237,7 +237,7 @@ namespace PluginAutotask.Plugin
 
                 Logger.SetLogPrefix(jobId);
 
-                if (string.IsNullOrWhiteSpace(schema.Query))
+                if (!string.IsNullOrWhiteSpace(schema.Query))
                 {
                     userDefinedQuery = Utility.ParseUserDefinedQuery(schema.Query);
                 }
