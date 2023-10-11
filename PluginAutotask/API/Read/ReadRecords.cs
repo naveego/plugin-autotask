@@ -10,7 +10,7 @@ namespace PluginAutotask.API.Read
 {
     public static partial class Read
     {
-        public static async IAsyncEnumerable<Record> ReadRecordsAsync(IApiClient apiClient, Schema schema, int limit = -1) 
+        public static async IAsyncEnumerable<Record> ReadRecordsAsync(IApiClient apiClient, Schema schema, int limit = -1, UserDefinedQuery? userDefinedQuery = null) 
         {
             if (schema.Id == "TicketHistory")
             {
@@ -22,13 +22,21 @@ namespace PluginAutotask.API.Read
                 }
             }
 
-            var query = Utility.Utility.GetQueryForSchemaId(schema.Id);
+            var entityId = schema.Id;
+            var query = Utility.Utility.GetDefaultQueryForEntityId(schema.Id);
+
+            if (userDefinedQuery != null) 
+            {
+                entityId = userDefinedQuery.EntityId;
+                query = userDefinedQuery.Query;
+            }
+
             if (limit >= 0) 
             {
                 query.MaxRecords = Math.Min(limit, 500);
             }
 
-            var queryResult = await apiClient.GetAsync($"/{schema.Id}/query?search={JsonConvert.SerializeObject(query)}");
+            var queryResult = await apiClient.GetAsync($"/{entityId}/query?search={JsonConvert.SerializeObject(query)}");
                 
             try
             {

@@ -11,6 +11,8 @@ using PluginAutotask.API.Discover;
 using PluginAutotask.API.Factory;
 using PluginAutotask.API.Read;
 using PluginAutotask.Helper;
+using PluginAutotask.DataContracts;
+using PluginAutotask.API.Utility;
 
 namespace PluginAutotask.Plugin
 {
@@ -227,14 +229,20 @@ namespace PluginAutotask.Plugin
             try
             {
                 var schema = request.Schema;
-                var limit = checked((int) request.Limit);;
+                var limit = checked((int) request.Limit);
                 var limitFlag = request.Limit != 0;
                 var jobId = request.JobId;
                 long recordsCount = 0;
+                UserDefinedQuery? userDefinedQuery = null;
 
                 Logger.SetLogPrefix(jobId);
+
+                if (string.IsNullOrWhiteSpace(schema.Query))
+                {
+                    userDefinedQuery = Utility.ParseUserDefinedQuery(schema.Query);
+                }
                 
-                var records = Read.ReadRecordsAsync(_apiClient, schema, limit);
+                var records = Read.ReadRecordsAsync(_apiClient, schema, limit, userDefinedQuery);
 
                 await foreach (var record in records)
                 {

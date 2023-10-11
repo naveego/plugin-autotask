@@ -14,9 +14,10 @@ namespace PluginAutotask.API.Discover
             foreach (var refreshSchema in refreshSchemas)
             {
                 var schema = refreshSchema;
-                // not user defined
-                if (Constants.EntitiesList.Contains(schema.Id))
+                
+                if (string.IsNullOrWhiteSpace(schema.Query))
                 {
+                    // not user defined
                     schema = await AddPropertiesForEntity(apiClient, schema);
                     schema = await AddSampleAndCount(apiClient, schema, sampleSize);
 
@@ -24,7 +25,12 @@ namespace PluginAutotask.API.Discover
                 }
                 else
                 {
-                    // TODO: add support for user defined schemas
+                    // user defined
+                    var userDefinedQuery = Utility.Utility.ParseUserDefinedQuery(schema.Query);
+
+                    schema = await AddPropertiesForEntity(apiClient, schema, userDefinedQuery);
+                    schema = await AddSampleAndCount(apiClient, schema, sampleSize, userDefinedQuery);
+
                     yield return schema;
                 }
             }

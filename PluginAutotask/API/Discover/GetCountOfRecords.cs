@@ -10,10 +10,18 @@ namespace PluginAutotask.API.Discover
 {
     public static partial class Discover
     {
-        public static async Task<Count> GetCountOfRecords(IApiClient apiClient, Schema schema)
+        public static async Task<Count> GetCountOfRecords(IApiClient apiClient, Schema schema, UserDefinedQuery? userDefinedQuery = null)
         {
-            var query = Utility.Utility.GetQueryForSchemaId(schema.Id);
-            var countResult = await apiClient.GetAsync($"/{schema.Id}/query/count?search={JsonConvert.SerializeObject(query)}");
+            var entityId = schema.Id;
+            var query = Utility.Utility.GetDefaultQueryForEntityId(schema.Id);
+
+            if (userDefinedQuery != null) 
+            {
+                entityId = userDefinedQuery.EntityId;
+                query = userDefinedQuery.Query;
+            }
+            
+            var countResult = await apiClient.GetAsync($"/{entityId}/query/count?search={JsonConvert.SerializeObject(query)}");
             
             try
             {
