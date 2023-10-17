@@ -32,7 +32,9 @@
         "ApiZone",
         "ApiIntegrationCode",
         "UserName",
-        "Secret"
+        "Secret",
+        "ApiUsageThreshold",
+        "ApiDelayIntervalSeconds"
       ],
       "Secret":
       {
@@ -54,20 +56,32 @@
         },
         "UserName" : {
           "type": "string",
-          "title": "UserName",
-          "description": "API UserName"
+          "title": "Username",
+          "description": "API Username"
         },
         "Secret": {
           "type": "string",
           "title": "Secret",
           "description": "API Secret"
+        },
+        "ApiUsageThreshold" : {
+          "type": "number",
+          "title": "Api Usage Threshold",
+          "description": "The number of calls before the plugin will stop making calls until the usage has dropped below the configured threshold"
+        },
+        "ApiDelayIntervalSeconds": {
+          "type": "number",
+          "title": "Api Delay Interval Seconds",
+          "description": "The number of seconds the plugin will wait between checking if the number of API calls is over the configured usage threshold"
         }
       },
       "required": [
         "UserName",
         "Secret",
         "ApiIntegrationCode",
-        "ApiZone"
+        "ApiZone",
+        "ApiUsageThreshold",
+        "ApiDelayIntervalSeconds"
       ]
     }
   }

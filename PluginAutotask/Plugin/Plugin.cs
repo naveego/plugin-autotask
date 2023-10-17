@@ -234,7 +234,7 @@ namespace PluginAutotask.Plugin
 
                 Logger.SetLogPrefix(jobId);
                 
-                var records = Read.ReadRecordsAsync(_apiClient, schema, limit);
+                var records = Read.ReadRecordsAsync(_apiClient, schema, limit, _server.Settings.ApiUsageThreshold, _server.Settings.ApiDelayIntervalSeconds);
 
                 await foreach (var record in records)
                 {
