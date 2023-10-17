@@ -242,7 +242,7 @@ namespace PluginAutotask.Plugin
                     userDefinedQuery = Utility.ParseUserDefinedQuery(schema.Query);
                 }
                 
-                var records = Read.ReadRecordsAsync(_apiClient, schema, limit, userDefinedQuery);
+                var records = Read.ReadRecordsAsync(_apiClient, schema, limit, userDefinedQuery, _server.Settings.ApiUsageThreshold, _server.Settings.ApiDelayIntervalSeconds);
 
                 await foreach (var record in records)
                 {

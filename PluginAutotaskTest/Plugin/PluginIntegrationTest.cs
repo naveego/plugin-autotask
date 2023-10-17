@@ -1,14 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Aunalytics.Sdk.Plugins;
 using Newtonsoft.Json;
-using PluginAutotask.API.Read;
-using PluginAutotask.API.Utility;
-using PluginAutotask.DataContracts;
 using PluginAutotask.Helper;
 using Xunit;
 using Record = Aunalytics.Sdk.Plugins.Record;
@@ -25,7 +20,9 @@ namespace PluginAutotaskTest.Plugin
                 ApiZone = @"",
                 UserName = @"",
                 Secret = @"",
-                ApiIntegrationCode = @""
+                ApiIntegrationCode = @"",
+                ApiUsageThreshold = 5000,
+                ApiDelayIntervalSeconds = 300,
             };
     }
 

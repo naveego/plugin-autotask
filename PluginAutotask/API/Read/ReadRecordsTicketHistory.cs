@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Aunalytics.Sdk.Logging;
 using Aunalytics.Sdk.Plugins;
 using Newtonsoft.Json;
@@ -20,7 +21,6 @@ namespace PluginAutotask.API.Read
                 ticketsQuery.MaxRecords = Math.Min(limit, 500);
             }
 
-            
             var ticketsQueryResult = await apiClient.GetAsync($"/Tickets/query?search={JsonConvert.SerializeObject(ticketsQuery)}");
             try
             {
@@ -35,6 +35,11 @@ namespace PluginAutotask.API.Read
             var ticketsQueryWrapper = JsonConvert.DeserializeObject<QueryWrapper>(await ticketsQueryResult.Content.ReadAsStringAsync());
             foreach (var rawTicketRecord in ticketsQueryWrapper.Items)
             {
+                while (ReadTcs.Task.IsCanceled)
+                {
+                    Thread.Sleep(ApiDelayIntervalSeconds * 1000);
+                }
+
                 var ticketId = rawTicketRecord["id"];
                 query.Filter.First().Value = ticketId;
                 
@@ -58,6 +63,11 @@ namespace PluginAutotask.API.Read
             
             while (ticketsQueryWrapper.PageDetails.NextPageUrl != null)
             {
+                while (ReadTcs.Task.IsCanceled)
+                {
+                    Thread.Sleep(ApiDelayIntervalSeconds * 1000);
+                }
+
                 ticketsQueryResult = await apiClient.GetAsync(ticketsQueryWrapper.PageDetails.NextPageUrl);
                 try
                 {
@@ -72,6 +82,11 @@ namespace PluginAutotask.API.Read
                 ticketsQueryWrapper = JsonConvert.DeserializeObject<QueryWrapper>(await ticketsQueryResult.Content.ReadAsStringAsync());
                 foreach (var rawTicketRecord in ticketsQueryWrapper.Items)
                 {
+                    while (ReadTcs.Task.IsCanceled)
+                    {
+                        Thread.Sleep(ApiDelayIntervalSeconds * 1000);
+                    }
+
                     var ticketId = rawTicketRecord["id"];
                     query.Filter.First().Value = ticketId;
                     
