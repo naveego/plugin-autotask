@@ -24,11 +24,14 @@ namespace PluginAutotask.API.Factory
             Client = client;
             Settings = settings;
             BaseApiUrl = $"https://{Settings.ApiZone}.autotask.net/ATServicesRest/V1.0/";
+
+            Client.DefaultRequestHeaders.Clear();
+            Client.DefaultRequestHeaders.Accept.Clear();
             
-            Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             Client.DefaultRequestHeaders.Add("Username", Settings.UserName);
             Client.DefaultRequestHeaders.Add("Secret", Settings.Secret);
             Client.DefaultRequestHeaders.Add("ApiIntegrationCode", Settings.ApiIntegrationCode);
+            Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
         public Settings GetSettings()
