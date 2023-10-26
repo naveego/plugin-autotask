@@ -82,7 +82,8 @@ namespace PluginAutotask.API.Read
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e, e.Message);
+                    var errorMessage = await queryResult.Content.ReadAsStringAsync();
+                    Logger.Error(e, errorMessage);
                     throw;
                 }
                 
@@ -107,7 +108,8 @@ namespace PluginAutotask.API.Read
                     }
                     catch (Exception e)
                     {
-                        Logger.Error(e, e.Message);
+                        var errorMessage = await queryResult.Content.ReadAsStringAsync();
+                        Logger.Error(e, errorMessage);
                         throw;
                     }
                     
