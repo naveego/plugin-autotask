@@ -35,6 +35,7 @@ namespace PluginAutotask.API.Utility
         public static string UserDefinedProperty = "User defined property";
 
         public static List<string> EntitiesList { get; set; } = new List<string>() {
+            // phase 1
             "BillingCodes",
             "BillingItems",
             "ContactBillingProductAssociations",
@@ -74,6 +75,36 @@ namespace PluginAutotask.API.Utility
             "TimeEntries",
             "UserDefinedFieldDefinitions",
             "UserDefinedFieldListItems",
+            // phase 2
+            "CompanyAlerts",
+            "CompanyLocations",
+            "ContractBlockHourFactors",
+            "ContractBlocks",
+            "ContractMilestones",
+            "DeletedTaskActivityLogs",
+            "DeletedTicketActivityLogs",
+            "DeletedTicketLogs",
+            "Departments",
+            "Opportunities",
+            "OpportunityCategories",
+            "OrganizationalLevel1s",
+            "OrganizationalLevel2s",
+            "OrganizationalLevelAssociations",
+            "OrganizationalResources",
+            "PaymentTerms",
+            "Phases",
+            "ProductTiers",
+            "ProductVendors",
+            "ProjectCharges",
+            "Quotes",
+            "ResourceRoleDepartments",
+            "ResourceSkills",
+            "ServiceCalls",
+            "ServiceCallTaskResources",
+            "ServiceCallTasks",
+            "ServiceCallTicketResources",
+            "ServiceCallTickets",
+            "Skills",
         };
     }
 }
