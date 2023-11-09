@@ -1,7 +1,7 @@
 using System.Net.Http;
-using PluginHubspot.Helper;
+using PluginAutotask.Helper;
 
-namespace PluginHubspot.API.Factory
+namespace PluginAutotask.API.Factory
 {
     public class ApiClientFactory: IApiClientFactory
     {

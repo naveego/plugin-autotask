@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
 using Grpc.Core;
-using Naveego.Sdk.Logging;
-using Naveego.Sdk.Plugins;
+using Aunalytics.Sdk.Logging;
+using Aunalytics.Sdk.Plugins;
 
-namespace PluginHubspot
+namespace PluginAutotask
 {
     class Program
     {

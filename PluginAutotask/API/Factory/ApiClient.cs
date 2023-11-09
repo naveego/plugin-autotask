@@ -6,27 +6,31 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
-using Naveego.Sdk.Logging;
+using Aunalytics.Sdk.Logging;
 using Newtonsoft.Json;
-using PluginHubspot.API.Utility;
-using PluginHubspot.Helper;
+using PluginAutotask.API.Utility;
+using PluginAutotask.Helper;
 
-namespace PluginHubspot.API.Factory
+namespace PluginAutotask.API.Factory
 {
     public class ApiClient: IApiClient
     {
-       // private IApiAuthenticator Authenticator { get; set; }
         private static HttpClient Client { get; set; }
         private Settings Settings { get; set; }
-
-        //private const string ApiKeyParam = "hapikey";
+        private string BaseApiUrl { get; set; }
 
         public ApiClient(HttpClient client, Settings settings)
         {
-            //Authenticator = new ApiAuthenticator(client, settings);
             Client = client;
             Settings = settings;
+            BaseApiUrl = $"https://{Settings.ApiZone}.autotask.net/ATServicesRest/V1.0/";
+
+            Client.DefaultRequestHeaders.Clear();
+            Client.DefaultRequestHeaders.Accept.Clear();
             
+            Client.DefaultRequestHeaders.Add("Username", Settings.UserName);
+            Client.DefaultRequestHeaders.Add("Secret", Settings.Secret);
+            Client.DefaultRequestHeaders.Add("ApiIntegrationCode", Settings.ApiIntegrationCode);
             Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
@@ -39,38 +43,8 @@ namespace PluginHubspot.API.Factory
         {
             try
             {
-                //var token = await Authenticator.GetToken();
-                var uriBuilder = new UriBuilder(
-                    $"{Constants.HttpsPrefix.TrimEnd('.')}" +
-                    $"{Settings.ApiZone.TrimEnd('.')}" +
-                    $"." +
-                    $"{Constants.DomainApiUrl.TrimEnd('/')}" +
-                    $"/" +
-                    $"{Constants.TestConnectionPath.TrimStart('/')}"
-                    );
-                var query = HttpUtility.ParseQueryString(uriBuilder.Query);
-
-                uriBuilder.Query = query.ToString();
-                
-                var uri = new Uri(uriBuilder.ToString());
-                
-                var request = new HttpRequestMessage
-                {
-                    Method = HttpMethod.Get,
-                    RequestUri = uri,
-                };
-                {
-                    request.Headers.Add("Username", Settings.UserName);
-                    request.Headers.Add("Secret", Settings.Secret);
-                    request.Headers.Add("ApiIntegrationCode", Settings.ApiIntegrationCode);
-                }
-
-                
-                var response = await Client.SendAsync(request);
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw new Exception(await response.Content.ReadAsStringAsync());
-                }
+                var response = await GetAsync(Constants.TestConnectionPath);
+                response.EnsureSuccessStatusCode();
             }
             catch (Exception e)
             {
@@ -79,24 +53,12 @@ namespace PluginHubspot.API.Factory
             }
         }
 
-        public async Task<HttpResponseMessage> GetAsync(string path, bool is_full_path = false)
+        public async Task<HttpResponseMessage> GetAsync(string path)
         {
             try
             {
-                var uriBuilder = new UriBuilder(
-                    is_full_path ? 
-                    path //path is full path, do not build
-                    :    //else, build path
-                    $"{Constants.HttpsPrefix}" +
-                    $"{Settings.ApiZone.TrimEnd('.')}" +
-                    $"." +
-                    $"{Constants.DomainApiUrl.TrimEnd('/')}" +
-                    $"/" +
-                    $"{path.TrimStart('/')}"
-                    );
-                
+                var uriBuilder = new UriBuilder($"{BaseApiUrl.TrimEnd('/')}/{path.Replace(BaseApiUrl, "").TrimStart('/')}");
                 var query = HttpUtility.ParseQueryString(uriBuilder.Query);
-
                 uriBuilder.Query = query.ToString();
                 
                 var uri = new Uri(uriBuilder.ToString());
@@ -107,11 +69,6 @@ namespace PluginHubspot.API.Factory
                     RequestUri = uri,
                 };
 
-                
-                request.Headers.Add("Username", Settings.UserName);
-                request.Headers.Add("Secret", Settings.Secret);
-                request.Headers.Add("ApiIntegrationCode", Settings.ApiIntegrationCode);
-                
                 return await Client.SendAsync(request);
             }
             catch (Exception e)
@@ -121,15 +78,12 @@ namespace PluginHubspot.API.Factory
             }
         }
 
-        // public async Task<HttpResponseMessage> PostAsync(string path, StringContent json)
-        public async Task<HttpResponseMessage> PostAsync(string path, string json)
+        public async Task<HttpResponseMessage> PostAsync(string path, StringContent json)
         {
             try
             {
-                //var token = await Authenticator.GetToken();
-                var uriBuilder = new UriBuilder($"{Constants.DomainApiUrl.TrimEnd('/')}/{path.TrimStart('/')}");
+                var uriBuilder = new UriBuilder($"{BaseApiUrl.TrimEnd('/')}/{path.Replace(BaseApiUrl, "").TrimStart('/')}");
                 var query = HttpUtility.ParseQueryString(uriBuilder.Query);
-
                 uriBuilder.Query = query.ToString();
                 
                 var uri = new Uri(uriBuilder.ToString());
@@ -138,15 +92,9 @@ namespace PluginHubspot.API.Factory
                 {
                     Method = HttpMethod.Post,
                     RequestUri = uri,
-                    //Content = json
+                    Content = json
                 };
-                var values =
-                    JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-                foreach (var value in values)
-                {
-                    request.Headers.Add(value.Key, value.Value);
-                }
-                
+
                 return await Client.SendAsync(request);
             }
             catch (Exception e)
@@ -156,15 +104,12 @@ namespace PluginHubspot.API.Factory
             }
         }
 
-        // public async Task<HttpResponseMessage> PutAsync(string path, StringContent json)
-        public async Task<HttpResponseMessage> PutAsync(string path, string json)
+        public async Task<HttpResponseMessage> PutAsync(string path, StringContent json)
         {
             try
             {
-                //var token = await Authenticator.GetToken();
-                var uriBuilder = new UriBuilder($"{Constants.DomainApiUrl.TrimEnd('/')}/{path.TrimStart('/')}");
+                var uriBuilder = new UriBuilder($"{BaseApiUrl.TrimEnd('/')}/{path.Replace(BaseApiUrl, "").TrimStart('/')}");
                 var query = HttpUtility.ParseQueryString(uriBuilder.Query);
-
                 uriBuilder.Query = query.ToString();
                 
                 var uri = new Uri(uriBuilder.ToString());
@@ -173,14 +118,8 @@ namespace PluginHubspot.API.Factory
                 {
                     Method = HttpMethod.Put,
                     RequestUri = uri,
-                    //Content = json
+                    Content = json
                 };
-                var values =
-                    JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-                foreach (var value in values)
-                {
-                    request.Headers.Add(value.Key, value.Value);
-                }
 
                 return await Client.SendAsync(request);
             }
@@ -191,36 +130,23 @@ namespace PluginHubspot.API.Factory
             }
         }
 
-          public async Task<HttpResponseMessage> PatchAsync(string path, string json)
+        public async Task<HttpResponseMessage> PatchAsync(string path, StringContent json)
         {
             try
             {
-                var uriBuilder = new UriBuilder($"{Constants.HttpsPrefix}" +
-                                                $"{Settings.ApiZone.TrimEnd('.')}" +
-                                                $"." +
-                                                $"{Constants.DomainApiUrl.TrimEnd('/')}" +
-                                                $"/" +
-                                                $"{path.TrimStart('/')}"
-                );
+                var uriBuilder = new UriBuilder($"{BaseApiUrl.TrimEnd('/')}/{path.Replace(BaseApiUrl, "").TrimStart('/')}");
                 var query = HttpUtility.ParseQueryString(uriBuilder.Query);
-
                 uriBuilder.Query = query.ToString();
                 
                 var uri = new Uri(uriBuilder.ToString());
-
-
+                
                 var request = new HttpRequestMessage
                 {
                     Method = HttpMethod.Patch,
                     RequestUri = uri,
-                    Content = new StringContent(json, Encoding.UTF8, "application/json")
+                    Content = json
                 };
-                
-                request.Headers.Add("Username", Settings.UserName);
-                request.Headers.Add("Secret", Settings.Secret);
-                request.Headers.Add("ApiIntegrationCode", Settings.ApiIntegrationCode);
-                
-                
+
                 return await Client.SendAsync(request);
             }
             catch (Exception e)
@@ -234,10 +160,8 @@ namespace PluginHubspot.API.Factory
         {
             try
             {
-                //var token = await Authenticator.GetToken();
-                var uriBuilder = new UriBuilder($"{Constants.DomainApiUrl.TrimEnd('/')}/{path.TrimStart('/')}");
+                var uriBuilder = new UriBuilder($"{BaseApiUrl.TrimEnd('/')}/{path.Replace(BaseApiUrl, "").TrimStart('/')}");
                 var query = HttpUtility.ParseQueryString(uriBuilder.Query);
-
                 uriBuilder.Query = query.ToString();
                 
                 var uri = new Uri(uriBuilder.ToString());
