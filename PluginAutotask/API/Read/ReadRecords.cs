@@ -21,7 +21,7 @@ namespace PluginAutotask.API.Read
         static int ApiDelayIntervalSeconds = 300;
 
         public static async IAsyncEnumerable<Record> ReadRecordsAsync(IApiClient apiClient, Schema schema, int limit = -1, 
-            int apiDelayThreshold = 5000, int apiDelayIntervalSeconds = 300) 
+            UserDefinedQuery? userDefinedQuery = null, int apiDelayThreshold = 5000, int apiDelayIntervalSeconds = 300) 
         {
             ApiClient = apiClient;
             ReadTcs = new TaskCompletionSource<bool>();
@@ -60,13 +60,21 @@ namespace PluginAutotask.API.Read
             }
             else
             {
-                var query = Utility.Utility.GetQueryForSchemaId(schema.Id);
+                var entityId = schema.Id;
+                var query = Utility.Utility.GetDefaultQueryForEntityId(schema.Id);
+
+                if (userDefinedQuery != null) 
+                {
+                    entityId = userDefinedQuery.EntityId;
+                    query = userDefinedQuery.Query;
+                }
+
                 if (limit >= 0) 
                 {
                     query.MaxRecords = Math.Min(limit, 500);
                 }
 
-                var queryResult = await apiClient.GetAsync($"/{schema.Id}/query?search={JsonConvert.SerializeObject(query)}");
+                var queryResult = await apiClient.GetAsync($"/{entityId}/query?search={JsonConvert.SerializeObject(query)}");
                     
                 try
                 {
@@ -74,7 +82,8 @@ namespace PluginAutotask.API.Read
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e, e.Message);
+                    var errorMessage = await queryResult.Content.ReadAsStringAsync();
+                    Logger.Error(e, errorMessage);
                     throw;
                 }
                 
@@ -99,7 +108,8 @@ namespace PluginAutotask.API.Read
                     }
                     catch (Exception e)
                     {
-                        Logger.Error(e, e.Message);
+                        var errorMessage = await queryResult.Content.ReadAsStringAsync();
+                        Logger.Error(e, errorMessage);
                         throw;
                     }
                     
@@ -110,7 +120,6 @@ namespace PluginAutotask.API.Read
                     }
                 }
             }
-
             ReadTimer.Enabled = false;
         }
 

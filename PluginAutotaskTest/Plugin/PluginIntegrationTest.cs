@@ -36,13 +36,24 @@ namespace PluginAutotaskTest.Plugin
             };
         }
 
-        private Schema GetTestSchema(string endpoint = "BillingCodes")
+        private Schema GetTestSchema(string entityId = "BillingCodes")
         {
             return new Schema
             {
-                Id = endpoint,
-                Name = endpoint,
-                PublisherMetaJson = JsonConvert.SerializeObject(endpoint),
+                Id = entityId,
+                Name = entityId,
+            };
+        }
+
+        private const string DefaultQuery = @"BillingCodes
+{""Filter"":[{""field"":""Id"",""op"":""gte"",""value"":0}]}";
+        private Schema GetUserDefinedSchema(string query = DefaultQuery)
+        {
+            return new Schema
+            {
+                Id = "custom",
+                Name = "custom",
+                Query = query,
             };
         }
 
@@ -232,6 +243,68 @@ namespace PluginAutotaskTest.Plugin
         }
 
         [Fact]
+        public async Task DiscoverSchemasUserDefinedTest()
+        {
+            // setup
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginAutotask.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings();
+
+            var query = @"BillingCodes
+{""Filter"":[{""field"":""Id"",""op"":""gte"",""value"":0}]}";
+
+            var request = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.Refresh,
+                SampleSize = 10,
+                ToRefresh =
+                {
+                    GetUserDefinedSchema(query)
+                }
+            };
+
+            // act
+            client.Connect(connectRequest);
+            var response = client.DiscoverSchemas(request);
+
+            // assert
+            Assert.IsType<DiscoverSchemasResponse>(response);
+            Assert.Equal(1, response.Schemas.Count);
+            
+            var schema = response.Schemas[0];
+            Assert.Equal("BillingCodes", schema.Id);
+            Assert.Equal("BillingCodes", schema.Name);
+            Assert.Equal("BillingCodes\n{\"Filter\":[{\"field\":\"Id\",\"op\":\"gte\",\"value\":0}]}", schema.Query);
+            Assert.Equal(10, schema.Sample.Count);
+            Assert.Equal(15, schema.Properties.Count);
+        
+            var property = schema.Properties[0];
+            Assert.Equal("afterHoursWorkType", property.Id);
+            Assert.Equal("afterHoursWorkType", property.Name);
+            Assert.False(property.IsKey);
+            Assert.Equal("", property.Description);
+            Assert.Equal(PropertyType.Integer, property.Type);
+            Assert.Equal("integer", property.TypeAtSource);
+            Assert.True(property.IsNullable);
+            Assert.False(property.IsCreateCounter);
+            Assert.False(property.IsUpdateCounter);
+            
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+
+        [Fact]
         public async Task ReadStreamTest()
         {
             // setup
@@ -281,10 +354,9 @@ namespace PluginAutotaskTest.Plugin
             }
 
             // assert
-            Assert.Equal(70611, records.Count);
+            Assert.Equal(70653, records.Count);
 
             var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
-            // Assert.Equal("~", record["tilde"]);
 
             // cleanup
             await channel.ShutdownAsync();
@@ -325,7 +397,7 @@ namespace PluginAutotaskTest.Plugin
                     JobId = "test"
                 },
                 JobId = "test",
-                Limit = 100
+                Limit = 600
             };
 
             // act
@@ -343,7 +415,71 @@ namespace PluginAutotaskTest.Plugin
             }
 
             // assert
-            Assert.Equal(100, records.Count);
+            Assert.Equal(600, records.Count);
+
+            var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+
+        [Fact]
+        public async Task ReadStreamUserDefinedQueryTest()
+        {
+            // setup
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginAutotask.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings();
+
+            var query = @"Invoices
+{""Filter"":[{""field"":""Id"",""op"":""gte"",""value"":0}]}";
+
+            var schemaRequest = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.Refresh,
+                SampleSize = 0,
+                ToRefresh =
+                {
+                    GetUserDefinedSchema(query)
+                }
+            };
+
+            var request = new ReadRequest()
+            {
+                DataVersions = new DataVersions
+                {
+                    JobId = "test"
+                },
+                JobId = "test",
+            };
+
+            // act
+            client.Connect(connectRequest);
+            var schemasResponse = client.DiscoverSchemas(schemaRequest);
+            request.Schema = schemasResponse.Schemas[0];
+
+            var response = client.ReadStream(request);
+            var responseStream = response.ResponseStream;
+            var records = new List<Record>();
+
+            while (await responseStream.MoveNext())
+            {
+                records.Add(responseStream.Current);
+            }
+
+            // assert
+            Assert.Equal(70653, records.Count);
 
             var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
 

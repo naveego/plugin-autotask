@@ -14,8 +14,8 @@ namespace PluginAutotask.API.Read
     {
         public static async IAsyncEnumerable<Record> ReadRecordsTicketHistoryAsync(IApiClient apiClient, Schema schema, int limit = -1) 
         {
-            var query = Utility.Utility.GetQueryForSchemaId(schema.Id);
-            var ticketsQuery = Utility.Utility.GetQueryForSchemaId("Tickets");
+            var query = Utility.Utility.GetDefaultQueryForEntityId(schema.Id);
+            var ticketsQuery = Utility.Utility.GetDefaultQueryForEntityId("Tickets");
             if (limit >= 0) 
             {
                 ticketsQuery.MaxRecords = Math.Min(limit, 500);
