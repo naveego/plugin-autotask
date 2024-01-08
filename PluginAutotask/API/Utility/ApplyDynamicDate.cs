@@ -21,7 +21,7 @@ namespace PluginAutotask.API.Utility
                 {
                     var value = (string)filter.Value;
                     var parts = value.Split('_');
-                    if (parts.Length != 3)
+                    if (parts.Length != 3 || parts[0] != "TODAYMINUS" || parts[2] != "DAYS")
                     {
                         throw new Exception($"Invalid dynamic date format given. Expected: 'TODAYMINUS_N_DAYS', Got: '{value}'");
                     }
