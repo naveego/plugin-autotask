@@ -15,14 +15,14 @@ namespace PluginAutotask.API.Discover
             var entityId = schema.Id;
             var query = Utility.Utility.GetDefaultQueryForEntityId(schema.Id);
 
-            if (userDefinedQuery != null) 
+            if (userDefinedQuery != null)
             {
                 entityId = userDefinedQuery.EntityId;
-                query = userDefinedQuery.Query;
+                query = Utility.Utility.ApplyDynamicDate(userDefinedQuery.Query);
             }
-            
+
             var countResult = await apiClient.GetAsync($"/{entityId}/query/count?search={JsonConvert.SerializeObject(query)}");
-            
+
             try
             {
                 countResult.EnsureSuccessStatusCode();
@@ -35,7 +35,7 @@ namespace PluginAutotask.API.Discover
 
             var countWrapper = JsonConvert.DeserializeObject<QueryCountWrapper>(await countResult.Content.ReadAsStringAsync());
 
-            return new Count() 
+            return new Count()
             {
                 Kind = Count.Types.Kind.Exact,
                 Value = countWrapper.QueryCount,

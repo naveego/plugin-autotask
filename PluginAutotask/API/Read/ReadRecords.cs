@@ -20,8 +20,8 @@ namespace PluginAutotask.API.Read
         static int ApiDelayThreshold = 5000;
         static int ApiDelayIntervalSeconds = 300;
 
-        public static async IAsyncEnumerable<Record> ReadRecordsAsync(IApiClient apiClient, Schema schema, int limit = -1, 
-            UserDefinedQuery? userDefinedQuery = null, int apiDelayThreshold = 5000, int apiDelayIntervalSeconds = 300) 
+        public static async IAsyncEnumerable<Record> ReadRecordsAsync(IApiClient apiClient, Schema schema, int limit = -1,
+            UserDefinedQuery? userDefinedQuery = null, int apiDelayThreshold = 5000, int apiDelayIntervalSeconds = 300)
         {
             ApiClient = apiClient;
             ReadTcs = new TaskCompletionSource<bool>();
@@ -33,13 +33,13 @@ namespace PluginAutotask.API.Read
                 ReadTimer = new Timer();
                 ReadTimer.Elapsed += new ElapsedEventHandler(OnApiUsageTimer);
             }
-            
+
             ReadTimer.Interval = ApiDelayIntervalSeconds * 1000;
             ReadTimer.Enabled = true;
 
             var thresholdWrapper = await CheckApiUsage();
 
-            if (thresholdWrapper.CurrentTimeframeRequestCount > ApiDelayThreshold) 
+            if (thresholdWrapper.CurrentTimeframeRequestCount > ApiDelayThreshold)
             {
                 ReadTcs.SetCanceled();
             }
@@ -52,7 +52,7 @@ namespace PluginAutotask.API.Read
             if (schema.Id == "TicketHistory")
             {
                 var records = ReadRecordsTicketHistoryAsync(apiClient, schema, limit);
-                
+
                 await foreach (var record in records)
                 {
                     yield return record;
@@ -63,19 +63,19 @@ namespace PluginAutotask.API.Read
                 var entityId = schema.Id;
                 var query = Utility.Utility.GetDefaultQueryForEntityId(schema.Id);
 
-                if (userDefinedQuery != null) 
+                if (userDefinedQuery != null)
                 {
                     entityId = userDefinedQuery.EntityId;
-                    query = userDefinedQuery.Query;
+                    query = Utility.Utility.ApplyDynamicDate(userDefinedQuery.Query);
                 }
 
-                if (limit >= 0) 
+                if (limit >= 0)
                 {
                     query.MaxRecords = Math.Min(limit, 500);
                 }
 
                 var queryResult = await apiClient.GetAsync($"/{entityId}/query?search={JsonConvert.SerializeObject(query)}");
-                    
+
                 try
                 {
                     queryResult.EnsureSuccessStatusCode();
@@ -86,13 +86,13 @@ namespace PluginAutotask.API.Read
                     Logger.Error(e, errorMessage);
                     throw;
                 }
-                
+
                 var queryWrapper = JsonConvert.DeserializeObject<QueryWrapper>(await queryResult.Content.ReadAsStringAsync());
                 foreach (var rawRecord in queryWrapper.Items)
                 {
                     yield return ConvertRawRecordToRecord(rawRecord, schema);
                 }
-                
+
                 while (queryWrapper.PageDetails.NextPageUrl != null)
                 {
                     while (ReadTcs.Task.IsCanceled)
@@ -112,7 +112,7 @@ namespace PluginAutotask.API.Read
                         Logger.Error(e, errorMessage);
                         throw;
                     }
-                    
+
                     queryWrapper = JsonConvert.DeserializeObject<QueryWrapper>(await queryResult.Content.ReadAsStringAsync());
                     foreach (var rawRecord in queryWrapper.Items)
                     {
@@ -165,14 +165,14 @@ namespace PluginAutotask.API.Read
                 }
             }
 
-            return new Record() 
+            return new Record()
             {
                 Action = Record.Types.Action.Upsert,
                 DataJson = JsonConvert.SerializeObject(recordMap),
             };
         }
 
-        private static async Task<ThresholdWrapper> CheckApiUsage() 
+        private static async Task<ThresholdWrapper> CheckApiUsage()
         {
             if (ApiClient == null)
             {
@@ -203,7 +203,7 @@ namespace PluginAutotask.API.Read
 
             var thresholdWrapper = await CheckApiUsage();
 
-            if (thresholdWrapper.CurrentTimeframeRequestCount > ApiDelayThreshold) 
+            if (thresholdWrapper.CurrentTimeframeRequestCount > ApiDelayThreshold)
             {
                 if (!ReadTcs.Task.IsCanceled)
                 {
