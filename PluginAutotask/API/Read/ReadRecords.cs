@@ -125,7 +125,25 @@ namespace PluginAutotask.API.Read
 
         private static Record ConvertRawRecordToRecord(Dictionary<string, object> rawRecord, Schema schema)
         {
+            List<UserDefinedField> rawUDFs;
             var recordMap = new Dictionary<string, object?>();
+
+            try
+            {
+                if (rawRecord.ContainsKey("userDefinedFields"))
+                {
+                    rawUDFs = JsonConvert.DeserializeObject<List<UserDefinedField>>(JsonConvert.SerializeObject(rawRecord["userDefinedFields"]));
+
+                    foreach (var udf in rawUDFs)
+                    {
+                        rawRecord.TryAdd(udf.Name, udf.Value);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $"Not able to parse UDFs");
+            }
 
             foreach (var property in schema.Properties)
             {
