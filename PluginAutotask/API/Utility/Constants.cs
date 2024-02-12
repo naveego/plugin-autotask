@@ -6,7 +6,7 @@ namespace PluginAutotask.API.Utility
     public static class Constants
     {
         public static string TestConnectionPath = "Companies/0";
-        public static Query GetAllRecordsQuery = new Query() 
+        public static Query GetAllRecordsQuery = new Query()
         {
             Filter = new List<Filter>()
             {
@@ -19,7 +19,7 @@ namespace PluginAutotask.API.Utility
             }
         };
 
-        public static Query GetAllRecordsQueryTicketHistory = new Query() 
+        public static Query GetAllRecordsQueryTicketHistory = new Query()
         {
             Filter = new List<Filter>()
             {
@@ -105,6 +105,11 @@ namespace PluginAutotask.API.Utility
             "ServiceCallTicketResources",
             "ServiceCallTickets",
             "Skills",
+            // DATAINT-1770
+            "Companies",
+            "Contacts",
+            "Tasks",
+            "Projects",
         };
     }
 }
