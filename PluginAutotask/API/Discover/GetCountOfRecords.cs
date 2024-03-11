@@ -4,6 +4,7 @@ using Aunalytics.Sdk.Logging;
 using Aunalytics.Sdk.Plugins;
 using Newtonsoft.Json;
 using PluginAutotask.API.Factory;
+using PluginAutotask.API.Utility;
 using PluginAutotask.DataContracts;
 
 namespace PluginAutotask.API.Discover
@@ -19,6 +20,11 @@ namespace PluginAutotask.API.Discover
             {
                 entityId = userDefinedQuery.EntityId;
                 query = Utility.Utility.ApplyDynamicDate(userDefinedQuery.Query);
+            }
+
+            if (Constants.IsRangedTicketHistoryName(schema.Id))
+            {
+                return await GetCountOfRecordsRangedTicketHistory(apiClient, schema, userDefinedQuery);
             }
 
             var countResult = await apiClient.GetAsync($"/{entityId}/query/count?search={JsonConvert.SerializeObject(query)}");

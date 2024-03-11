@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using PluginAutotask.API.Factory;
 using PluginAutotask.DataContracts;
 using Timer = System.Timers.Timer;
+using Constants = PluginAutotask.API.Utility.Constants;
 
 namespace PluginAutotask.API.Read
 {
@@ -49,9 +50,18 @@ namespace PluginAutotask.API.Read
                 Thread.Sleep(ApiDelayIntervalSeconds * 1000);
             }
 
-            if (schema.Id == "TicketHistory")
+            if (schema.Id == Constants.EntityTicketHistory)
             {
                 var records = ReadRecordsTicketHistoryAsync(apiClient, schema, limit);
+
+                await foreach (var record in records)
+                {
+                    yield return record;
+                }
+            }
+            else if (Constants.IsRangedTicketHistoryName(schema.Id))
+            {
+                var records = ReadRecordsRangedTicketHistoryAsync(apiClient, schema, limit);
 
                 await foreach (var record in records)
                 {
