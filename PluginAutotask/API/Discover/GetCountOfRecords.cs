@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Aunalytics.Sdk.Logging;
 using Aunalytics.Sdk.Plugins;
@@ -16,15 +17,25 @@ namespace PluginAutotask.API.Discover
             var entityId = schema.Id;
             var query = Utility.Utility.GetDefaultQueryForEntityId(schema.Id);
 
+            if (Constants.IsRangedTicketHistoryName(schema.Id))
+            {
+                var totalRecords = 0;
+                await foreach (var count in Read.Read.CountRecordsForRangedTicketHistory(apiClient, schema))
+                {
+                    totalRecords += count;
+                }
+
+                return new Count
+                {
+                    Kind = Count.Types.Kind.Exact,
+                    Value = totalRecords
+                };
+            }
+
             if (userDefinedQuery != null)
             {
                 entityId = userDefinedQuery.EntityId;
                 query = Utility.Utility.ApplyDynamicDate(userDefinedQuery.Query);
-            }
-
-            if (Constants.IsRangedTicketHistoryName(schema.Id))
-            {
-                return await GetCountOfRecordsRangedTicketHistory(apiClient, schema, userDefinedQuery);
             }
 
             var countResult = await apiClient.GetAsync($"/{entityId}/query/count?search={JsonConvert.SerializeObject(query)}");

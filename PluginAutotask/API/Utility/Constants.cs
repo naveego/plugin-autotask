@@ -6,6 +6,7 @@ namespace PluginAutotask.API.Utility
 {
     public static class Constants
     {
+        public const string EntityTickets = "Tickets";
         public const string EntityTicketHistory = "TicketHistory";
         public const string EntityTicketHistoryLast05 = "TicketHistoryLast05Days";
         public const string EntityTicketHistoryLast30 = "TicketHistoryLast30Days";
@@ -20,9 +21,9 @@ namespace PluginAutotask.API.Utility
 
         public static Query GetAllRecordsQuery = new Query()
         {
-            Filter = new List<Filter>()
+            Filter = new List<Filter>
             {
-                new Filter()
+                new Filter
                 {
                     Field = "id",
                     Operation = "gte",
@@ -33,9 +34,9 @@ namespace PluginAutotask.API.Utility
 
         public static Query GetAllRecordsQueryTicketHistory = new Query()
         {
-            Filter = new List<Filter>()
+            Filter = new List<Filter>
             {
-                new Filter()
+                new Filter
                 {
                     Field = "ticketID",
                     Operation = "eq",
@@ -46,9 +47,14 @@ namespace PluginAutotask.API.Utility
 
         public static Query RangedTicketQueryPrev05Days = new Query()
         {
-            Filter = new List<Filter>()
+            IncludeFields = new List<string>
             {
-                new Filter()
+                "id",
+                "lastActivityDate"
+            },
+            Filter = new List<Filter>
+            {
+                new Filter
                 {
                     Field = "lastActivityDate",
                     Operation = "gte",
@@ -59,9 +65,14 @@ namespace PluginAutotask.API.Utility
 
         public static Query RangedTicketQueryPrev30Days = new Query()
         {
-            Filter = new List<Filter>()
+            IncludeFields = new List<string>
             {
-                new Filter()
+                "id",
+                "lastActivityDate"
+            },
+            Filter = new List<Filter>
+            {
+                new Filter
                 {
                     Field = "lastActivityDate",
                     Operation = "gte",
@@ -72,7 +83,7 @@ namespace PluginAutotask.API.Utility
 
         public static string UserDefinedProperty = "User defined property";
 
-        public static List<string> EntitiesList { get; set; } = new List<string>() {
+        public static List<string> EntitiesList { get; set; } = new List<string> {
             // phase 1
             "BillingCodes",
             "BillingItems",

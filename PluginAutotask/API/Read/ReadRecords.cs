@@ -21,13 +21,15 @@ namespace PluginAutotask.API.Read
         static int ApiDelayThreshold = 5000;
         static int ApiDelayIntervalSeconds = 300;
 
-        public static async IAsyncEnumerable<Record> ReadRecordsAsync(IApiClient apiClient, Schema schema, int limit = -1,
-            UserDefinedQuery? userDefinedQuery = null, int apiDelayThreshold = 5000, int apiDelayIntervalSeconds = 300)
+        private static async Task SetClientAndThresholds(IApiClient apiClient, int? apiDelayThreshold = null, int? apiDelayIntervalSeconds = null)
         {
             ApiClient = apiClient;
             ReadTcs = new TaskCompletionSource<bool>();
-            ApiDelayThreshold = apiDelayThreshold;
-            ApiDelayIntervalSeconds = apiDelayIntervalSeconds;
+
+            if (apiDelayThreshold.HasValue)
+                ApiDelayThreshold = apiDelayThreshold.Value;
+            if (apiDelayIntervalSeconds.HasValue)
+                ApiDelayIntervalSeconds = apiDelayIntervalSeconds.Value;
 
             if (ReadTimer == null)
             {
@@ -49,19 +51,16 @@ namespace PluginAutotask.API.Read
             {
                 Thread.Sleep(ApiDelayIntervalSeconds * 1000);
             }
+        }
 
-            if (schema.Id == Constants.EntityTicketHistory)
+        public static async IAsyncEnumerable<Record> ReadRecordsAsync(IApiClient apiClient, Schema schema, int limit = -1,
+            UserDefinedQuery? userDefinedQuery = null, int apiDelayThreshold = 5000, int apiDelayIntervalSeconds = 300)
+        {
+            await SetClientAndThresholds(apiClient, apiDelayThreshold, apiDelayIntervalSeconds);
+
+            if (schema.Id == Constants.EntityTicketHistory || Constants.IsRangedTicketHistoryName(schema.Id))
             {
                 var records = ReadRecordsTicketHistoryAsync(apiClient, schema, limit);
-
-                await foreach (var record in records)
-                {
-                    yield return record;
-                }
-            }
-            else if (Constants.IsRangedTicketHistoryName(schema.Id))
-            {
-                var records = ReadRecordsRangedTicketHistoryAsync(apiClient, schema, limit);
 
                 await foreach (var record in records)
                 {

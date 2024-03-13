@@ -13,21 +13,15 @@ namespace PluginAutotask.API.Read
 {
     public static partial class Read
     {
-        public static async IAsyncEnumerable<Record> ReadRecordsTicketHistoryAsync(IApiClient apiClient, Schema schema, int limit = -1) 
+        public static async IAsyncEnumerable<int> CountRecordsForRangedTicketHistory(IApiClient apiClient, Schema schema)
         {
+            await SetClientAndThresholds(apiClient); // do not change thresholds
+
             var query = Utility.Utility.GetDefaultQueryForEntityId(Constants.EntityTicketHistory).Clone();
             var ticketsQuery = Utility.Utility.GetDefaultQueryForEntityId(schema.Id).Clone();
-            if (limit >= 0)
-            {
-                query.MaxRecords = Math.Min(limit, 500);
-                ticketsQuery.MaxRecords = 500;
-            }
+            ticketsQuery.MaxRecords = 500;
 
-            if (Constants.IsRangedTicketHistoryName(schema.Id))
-            {
-                ticketsQuery = Utility.Utility.ApplyDynamicDate(ticketsQuery);
-            }
-
+            ticketsQuery = Utility.Utility.ApplyDynamicDate(ticketsQuery);
             var ticketsQueryResult = await apiClient.GetAsync($"/{Constants.EntityTickets}/query?search={JsonConvert.SerializeObject(ticketsQuery)}");
             try
             {
@@ -49,8 +43,8 @@ namespace PluginAutotask.API.Read
 
                 var ticketId = rawTicketRecord["id"];
                 query.Filter.First().Value = ticketId;
-                
-                var queryResult = await apiClient.GetAsync($"/{Constants.EntityTicketHistory}/query?search={JsonConvert.SerializeObject(query)}");
+
+                var queryResult = await apiClient.GetAsync($"/{Constants.EntityTicketHistory}/query/count?search={JsonConvert.SerializeObject(query)}");
                 try
                 {
                     ticketsQueryResult.EnsureSuccessStatusCode();
@@ -61,11 +55,8 @@ namespace PluginAutotask.API.Read
                     throw;
                 }
 
-                var queryWrapper = JsonConvert.DeserializeObject<QueryWrapper>(await queryResult.Content.ReadAsStringAsync());
-                foreach (var rawRecord in queryWrapper.Items) 
-                {
-                    yield return ConvertRawRecordToRecord(rawRecord, schema);
-                }
+                var queryWrapper = JsonConvert.DeserializeObject<QueryCountWrapper>(await queryResult.Content.ReadAsStringAsync());
+                yield return queryWrapper.QueryCount;
             }
             
             while (ticketsQueryWrapper.PageDetails.NextPageUrl != null)
@@ -97,7 +88,7 @@ namespace PluginAutotask.API.Read
                     var ticketId = rawTicketRecord["id"];
                     query.Filter.First().Value = ticketId;
 
-                    var queryResult = await apiClient.GetAsync($"/{Constants.EntityTicketHistory}/query?search={JsonConvert.SerializeObject(query)}");
+                    var queryResult = await apiClient.GetAsync($"/{Constants.EntityTicketHistory}/query/count?search={JsonConvert.SerializeObject(query)}");
                     try
                     {
                         ticketsQueryResult.EnsureSuccessStatusCode();
@@ -108,11 +99,8 @@ namespace PluginAutotask.API.Read
                         throw;
                     }
 
-                    var queryWrapper = JsonConvert.DeserializeObject<QueryWrapper>(await queryResult.Content.ReadAsStringAsync());
-                    foreach (var rawRecord in queryWrapper.Items) 
-                    {
-                        yield return ConvertRawRecordToRecord(rawRecord, schema);
-                    }
+                    var queryWrapper = JsonConvert.DeserializeObject<QueryCountWrapper>(await queryResult.Content.ReadAsStringAsync());
+                    yield return queryWrapper.QueryCount;
                 }
             }
         }
