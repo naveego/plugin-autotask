@@ -21,7 +21,6 @@ namespace PluginAutotask.API.Read
             if (limit >= 0)
             {
                 query.MaxRecords = Math.Min(limit, 500);
-                ticketsQuery.MaxRecords = 500;
             }
 
             DateTime? queryDate = null;
