@@ -15,7 +15,6 @@ namespace PluginAutotask.API.Read
     {
         public static async IAsyncEnumerable<Record> ReadRecordsTicketHistoryAsync(IApiClient apiClient, Schema schema, int limit = -1) 
         {
-            var isRangedTicketHistory = Constants.IsRangedTicketHistoryName(schema.Id);
             var query = Utility.Utility.GetDefaultQueryForEntityId(Constants.EntityTicketHistory).Clone();
             var ticketsQuery = Utility.Utility.GetDefaultQueryForEntityId(schema.Id).Clone();
             if (limit >= 0)
@@ -24,7 +23,7 @@ namespace PluginAutotask.API.Read
             }
 
             DateTime? queryDate = null;
-            if (isRangedTicketHistory)
+            if (Constants.IsRangedTicketHistoryName(schema.Id))
             {
                 ticketsQuery = Utility.Utility.ApplyDynamicDate(ticketsQuery);
                 var queryDateString = ticketsQuery.Filter.First(f => f.Field == "lastActivityDate").Value;
@@ -66,27 +65,9 @@ namespace PluginAutotask.API.Read
                 }
 
                 var queryWrapper = JsonConvert.DeserializeObject<QueryWrapper>(await queryResult.Content.ReadAsStringAsync());
-                if (isRangedTicketHistory)
-                {
-                    foreach (var rawRecord in queryWrapper.Items)
-                    {
-                        var recordDateValue = rawRecord["date"];
-                        if (recordDateValue is DateTime recordDate)
-                        {
-                            if (recordDate < queryDate)
-                                continue;
-                        }
-
-                        yield return ConvertRawRecordToRecord(rawRecord, schema);
-                    }
-                }
-                else
-                {
-                    foreach (var rawRecord in queryWrapper.Items) 
-                    {
-                        yield return ConvertRawRecordToRecord(rawRecord, schema);
-                    }
-                }
+                var records = PullTicketHistoryRecordsFromWrapper(schema, queryWrapper, queryDate);
+                foreach (var record in records)
+                    yield return record;
             }
 
             while (ticketsQueryWrapper.PageDetails.NextPageUrl != null)
@@ -130,27 +111,35 @@ namespace PluginAutotask.API.Read
                     }
 
                     var queryWrapper = JsonConvert.DeserializeObject<QueryWrapper>(await queryResult.Content.ReadAsStringAsync());
-                    if (isRangedTicketHistory)
+                    var records = PullTicketHistoryRecordsFromWrapper(schema, queryWrapper, queryDate);
+                    foreach (var record in records)
+                        yield return record;
+                }
+            }
+        }
+    
+        private static IEnumerable<Record> PullTicketHistoryRecordsFromWrapper(
+            Schema schema, QueryWrapper queryWrapper, DateTime? queryDate
+        ) {
+            if (queryDate != null)
+            {
+                foreach (var rawRecord in queryWrapper.Items)
+                {
+                    var recordDateValue = rawRecord["date"];
+                    if (recordDateValue is DateTime recordDate)
                     {
-                        foreach (var rawRecord in queryWrapper.Items)
-                        {
-                            var recordDateValue = rawRecord["date"];
-                            if (recordDateValue is DateTime recordDate)
-                            {
-                                if (recordDate < queryDate)
-                                    continue;
-                            }
+                        if (recordDate < queryDate)
+                            continue;
+                    }
 
-                            yield return ConvertRawRecordToRecord(rawRecord, schema);
-                        }
-                    }
-                    else
-                    {
-                        foreach (var rawRecord in queryWrapper.Items) 
-                        {
-                            yield return ConvertRawRecordToRecord(rawRecord, schema);
-                        }
-                    }
+                    yield return ConvertRawRecordToRecord(rawRecord, schema);
+                }
+            }
+            else
+            {
+                foreach (var rawRecord in queryWrapper.Items)
+                {
+                    yield return ConvertRawRecordToRecord(rawRecord, schema);
                 }
             }
         }
