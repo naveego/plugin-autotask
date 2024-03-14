@@ -21,15 +21,14 @@ namespace PluginAutotask.API.Read
         static int ApiDelayThreshold = 5000;
         static int ApiDelayIntervalSeconds = 300;
 
-        private static async Task SetClientAndThresholds(IApiClient apiClient, int? apiDelayThreshold = null, int? apiDelayIntervalSeconds = null)
+        public static async IAsyncEnumerable<Record> ReadRecordsAsync(IApiClient apiClient, Schema schema, int limit = -1,
+            UserDefinedQuery? userDefinedQuery = null, int apiDelayThreshold = 5000, int apiDelayIntervalSeconds = 300)
         {
             ApiClient = apiClient;
             ReadTcs = new TaskCompletionSource<bool>();
 
-            if (apiDelayThreshold.HasValue)
-                ApiDelayThreshold = apiDelayThreshold.Value;
-            if (apiDelayIntervalSeconds.HasValue)
-                ApiDelayIntervalSeconds = apiDelayIntervalSeconds.Value;
+            ApiDelayThreshold = apiDelayThreshold;
+            ApiDelayIntervalSeconds = apiDelayIntervalSeconds;
 
             if (ReadTimer == null)
             {
@@ -51,12 +50,6 @@ namespace PluginAutotask.API.Read
             {
                 Thread.Sleep(ApiDelayIntervalSeconds * 1000);
             }
-        }
-
-        public static async IAsyncEnumerable<Record> ReadRecordsAsync(IApiClient apiClient, Schema schema, int limit = -1,
-            UserDefinedQuery? userDefinedQuery = null, int apiDelayThreshold = 5000, int apiDelayIntervalSeconds = 300)
-        {
-            await SetClientAndThresholds(apiClient, apiDelayThreshold, apiDelayIntervalSeconds);
 
             if (schema.Id == Constants.EntityTicketHistory || Constants.IsRangedTicketHistoryName(schema.Id))
             {

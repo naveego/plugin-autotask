@@ -15,6 +15,7 @@ namespace PluginAutotask.API.Read
     {
         public static async IAsyncEnumerable<Record> ReadRecordsTicketHistoryAsync(IApiClient apiClient, Schema schema, int limit = -1) 
         {
+            var isRangedTicketHistory = Constants.IsRangedTicketHistoryName(schema.Id);
             var query = Utility.Utility.GetDefaultQueryForEntityId(Constants.EntityTicketHistory).Clone();
             var ticketsQuery = Utility.Utility.GetDefaultQueryForEntityId(schema.Id).Clone();
             if (limit >= 0)
@@ -23,9 +24,13 @@ namespace PluginAutotask.API.Read
                 ticketsQuery.MaxRecords = 500;
             }
 
-            if (Constants.IsRangedTicketHistoryName(schema.Id))
+            DateTime? queryDate = null;
+            if (isRangedTicketHistory)
             {
                 ticketsQuery = Utility.Utility.ApplyDynamicDate(ticketsQuery);
+                var queryDateString = ticketsQuery.Filter.First(f => f.Field == "lastActivityDate").Value;
+                DateTime.TryParse(queryDateString.ToString(), out var date);
+                queryDate = date;
             }
 
             var ticketsQueryResult = await apiClient.GetAsync($"/{Constants.EntityTickets}/query?search={JsonConvert.SerializeObject(ticketsQuery)}");
@@ -62,12 +67,29 @@ namespace PluginAutotask.API.Read
                 }
 
                 var queryWrapper = JsonConvert.DeserializeObject<QueryWrapper>(await queryResult.Content.ReadAsStringAsync());
-                foreach (var rawRecord in queryWrapper.Items) 
+                if (isRangedTicketHistory)
                 {
-                    yield return ConvertRawRecordToRecord(rawRecord, schema);
+                    foreach (var rawRecord in queryWrapper.Items)
+                    {
+                        var recordDateValue = rawRecord["date"];
+                        if (recordDateValue is DateTime recordDate)
+                        {
+                            if (recordDate < queryDate)
+                                continue;
+                        }
+
+                        yield return ConvertRawRecordToRecord(rawRecord, schema);
+                    }
+                }
+                else
+                {
+                    foreach (var rawRecord in queryWrapper.Items) 
+                    {
+                        yield return ConvertRawRecordToRecord(rawRecord, schema);
+                    }
                 }
             }
-            
+
             while (ticketsQueryWrapper.PageDetails.NextPageUrl != null)
             {
                 while (ReadTcs.Task.IsCanceled)
@@ -109,9 +131,26 @@ namespace PluginAutotask.API.Read
                     }
 
                     var queryWrapper = JsonConvert.DeserializeObject<QueryWrapper>(await queryResult.Content.ReadAsStringAsync());
-                    foreach (var rawRecord in queryWrapper.Items) 
+                    if (isRangedTicketHistory)
                     {
-                        yield return ConvertRawRecordToRecord(rawRecord, schema);
+                        foreach (var rawRecord in queryWrapper.Items)
+                        {
+                            var recordDateValue = rawRecord["date"];
+                            if (recordDateValue is DateTime recordDate)
+                            {
+                                if (recordDate < queryDate)
+                                    continue;
+                            }
+
+                            yield return ConvertRawRecordToRecord(rawRecord, schema);
+                        }
+                    }
+                    else
+                    {
+                        foreach (var rawRecord in queryWrapper.Items) 
+                        {
+                            yield return ConvertRawRecordToRecord(rawRecord, schema);
+                        }
                     }
                 }
             }

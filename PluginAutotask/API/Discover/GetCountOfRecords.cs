@@ -19,16 +19,9 @@ namespace PluginAutotask.API.Discover
 
             if (Constants.IsRangedTicketHistoryName(schema.Id))
             {
-                var totalRecords = 0;
-                await foreach (var count in Read.Read.CountRecordsForRangedTicketHistory(apiClient, schema))
-                {
-                    totalRecords += count;
-                }
-
                 return new Count
                 {
-                    Kind = Count.Types.Kind.Exact,
-                    Value = totalRecords
+                    Kind = Count.Types.Kind.Unavailable
                 };
             }
 
