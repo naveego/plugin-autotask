@@ -9,7 +9,7 @@ namespace PluginAutotask.API.Discover
     {
         public static async IAsyncEnumerable<Schema> GetAllSchemas(IApiClient apiClient, int sampleSize = 5)
         {
-            foreach (var entity in Constants.EntitiesList) 
+            foreach (var entity in Constants.EntitiesList)
             {
                 // base schema to be added to
                 var schema = new Schema

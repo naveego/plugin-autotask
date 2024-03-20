@@ -1,9 +1,11 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Aunalytics.Sdk.Logging;
 using Aunalytics.Sdk.Plugins;
 using Newtonsoft.Json;
 using PluginAutotask.API.Factory;
+using PluginAutotask.API.Utility;
 using PluginAutotask.DataContracts;
 
 namespace PluginAutotask.API.Discover
@@ -14,6 +16,14 @@ namespace PluginAutotask.API.Discover
         {
             var entityId = schema.Id;
             var query = Utility.Utility.GetDefaultQueryForEntityId(schema.Id);
+
+            if (Constants.IsRangedTicketHistoryName(schema.Id))
+            {
+                return new Count
+                {
+                    Kind = Count.Types.Kind.Unavailable
+                };
+            }
 
             if (userDefinedQuery != null)
             {

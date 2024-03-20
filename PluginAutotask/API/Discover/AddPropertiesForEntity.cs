@@ -18,9 +18,13 @@ namespace PluginAutotask.API.Discover
             var properties = new List<Property>();
             var entityId = schema.Id;
 
-            if (userDefinedQuery != null) 
+            if (userDefinedQuery != null)
             {
                 entityId = userDefinedQuery.EntityId;
+            }
+            else if (Constants.IsRangedTicketHistoryName(schema.Id))
+            {
+                entityId = Constants.EntityTicketHistory;
             }
 
             try

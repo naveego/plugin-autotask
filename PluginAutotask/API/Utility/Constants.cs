@@ -1,16 +1,29 @@
 using System.Collections.Generic;
+using System.Linq;
 using PluginAutotask.DataContracts;
 
 namespace PluginAutotask.API.Utility
 {
     public static class Constants
     {
+        public const string EntityTickets = "Tickets";
+        public const string EntityTicketHistory = "TicketHistory";
+        public const string EntityTicketHistoryLast05 = "TicketHistoryLast05Days";
+        public const string EntityTicketHistoryLast30 = "TicketHistoryLast30Days";
+
         public static string TestConnectionPath = "Companies/0";
+
+        public static readonly string[] RangedTicketHistoryNames = new string[]
+        {
+            EntityTicketHistoryLast05,
+            EntityTicketHistoryLast30,
+        };
+
         public static Query GetAllRecordsQuery = new Query()
         {
-            Filter = new List<Filter>()
+            Filter = new List<Filter>
             {
-                new Filter()
+                new Filter
                 {
                     Field = "id",
                     Operation = "gte",
@@ -21,9 +34,9 @@ namespace PluginAutotask.API.Utility
 
         public static Query GetAllRecordsQueryTicketHistory = new Query()
         {
-            Filter = new List<Filter>()
+            Filter = new List<Filter>
             {
-                new Filter()
+                new Filter
                 {
                     Field = "ticketID",
                     Operation = "eq",
@@ -32,9 +45,45 @@ namespace PluginAutotask.API.Utility
             }
         };
 
+        public static Query RangedTicketQueryPrev05Days = new Query()
+        {
+            IncludeFields = new List<string>
+            {
+                "id",
+                "lastActivityDate"
+            },
+            Filter = new List<Filter>
+            {
+                new Filter
+                {
+                    Field = "lastActivityDate",
+                    Operation = "gte",
+                    Value = "TODAYMINUS_5_DAYS"
+                }
+            }
+        };
+
+        public static Query RangedTicketQueryPrev30Days = new Query()
+        {
+            IncludeFields = new List<string>
+            {
+                "id",
+                "lastActivityDate"
+            },
+            Filter = new List<Filter>
+            {
+                new Filter
+                {
+                    Field = "lastActivityDate",
+                    Operation = "gte",
+                    Value = "TODAYMINUS_30_DAYS"
+                }
+            }
+        };
+
         public static string UserDefinedProperty = "User defined property";
 
-        public static List<string> EntitiesList { get; set; } = new List<string>() {
+        public static List<string> EntitiesList { get; set; } = new List<string> {
             // phase 1
             "BillingCodes",
             "BillingItems",
@@ -70,7 +119,7 @@ namespace PluginAutotask.API.Utility
             "TaskSecondaryResources",
             "TicketCategories",
             "TicketCharges",
-            "TicketHistory",
+            EntityTicketHistory,
             "TicketNotes",
             "TimeEntries",
             "UserDefinedFieldDefinitions",
@@ -110,6 +159,12 @@ namespace PluginAutotask.API.Utility
             "Contacts",
             "Tasks",
             "Projects",
+            // DATAINT-1780
+            EntityTicketHistoryLast05,
+            EntityTicketHistoryLast30
         };
+
+        public static bool IsRangedTicketHistoryName(string entityName) =>
+            RangedTicketHistoryNames.Contains(entityName);
     }
 }
