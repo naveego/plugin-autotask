@@ -17,7 +17,7 @@ namespace PluginAutotask.API.Discover
             var entityId = schema.Id;
             var query = Utility.Utility.GetDefaultQueryForEntityId(schema.Id);
 
-            if (Constants.IsRangedTicketHistoryName(schema.Id))
+            if (schema.Id == Constants.EntityTicketHistory || Constants.IsRangedTicketHistoryName(schema.Id))
             {
                 return new Count
                 {

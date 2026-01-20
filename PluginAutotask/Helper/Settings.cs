@@ -33,11 +33,11 @@ namespace PluginAutotask.Helper
             {
                 throw new Exception("The ApiZone property must be set");
             }
-            if (ApiUsageThreshold == null || ApiUsageThreshold <= 0 || ApiUsageThreshold >= 10000)
+            if (ApiUsageThreshold <= 0 || ApiUsageThreshold >= 20000)
             {
-                throw new Exception("The ApiDelayThreshold property must be set to a non-zero positive number less than 10,000");
+                throw new Exception("The ApiDelayThreshold property must be set to a non-zero positive number less than 20,000");
             }
-            if (ApiDelayIntervalSeconds == null || ApiDelayIntervalSeconds <= 0)
+            if (ApiDelayIntervalSeconds <= 0)
             {
                 throw new Exception("The ApiDelayIntervalSeconds property must be set to a non-zero positive number");
             }
