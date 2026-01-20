@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Google.Protobuf.Collections;
 using Aunalytics.Sdk.Logging;
 using Aunalytics.Sdk.Plugins;
@@ -57,9 +56,6 @@ namespace PluginAutotask.API.Discover
                 {
                     yield return resultSchema;
                 }
-                
-                // Add delay to prevent API rate limiting
-                await Task.Delay(200);
             }
             
             Logger.Debug($"Schema refresh completed. Total: {processedCount}, Success: {successCount}, Failed: {failureCount}");

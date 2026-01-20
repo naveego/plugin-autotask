@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Aunalytics.Sdk.Logging;
 using Aunalytics.Sdk.Plugins;
 using PluginAutotask.API.Factory;
@@ -53,9 +52,6 @@ namespace PluginAutotask.API.Discover
                 {
                     yield return schema;
                 }
-                
-                // Add delay to prevent API rate limiting
-                await Task.Delay(200);
             }
             
             Logger.Debug($"Schema discovery completed. Total: {processedCount}, Success: {successCount}, Failed: {failureCount}");
